@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="atom">img/atom.png</file>
+        <file alias="author">img/author.png</file>
+        <file alias="exit">img/exit.png</file>
+        <file alias="minus">img/minus.png</file>
+        <file alias="plus">img/plus.png</file>
+        <file alias="qt_logo">img/qt_logo.png</file>
+        <file alias="rotate_minus">img/rotate_minus.png</file>
+        <file alias="rotate_plus">img/rotate_plus.png</file>
+        <file alias="save_as">img/save_as.png</file>
+    </qresource>
+</RCC>
