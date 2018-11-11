@@ -44,7 +44,6 @@ protected:
 
 private slots:
     void slotSelectFile(const QModelIndex&);
-    void slotSaveBmp(bool);
 
     void slotAuthor();
 

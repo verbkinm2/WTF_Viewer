@@ -9,5 +9,9 @@
         <file alias="rotate_minus">img/rotate_minus.png</file>
         <file alias="rotate_plus">img/rotate_plus.png</file>
         <file alias="save_as">img/save_as.png</file>
+        <file alias="border">img/sekection_border.png</file>
+        <file alias="pen">img/pen.png</file>
+        <file alias="cut">img/cut.png</file>
+        <file alias="reset">img/reset.png</file>
     </qresource>
 </RCC>

@@ -24,9 +24,15 @@ MainWindow::MainWindow(QWidget *parent)
     pEventFilter    = new EventFilter(pTreeView);
     pTreeView->installEventFilter(pEventFilter);
 
+
     pFSModel->setRootPath(QDir::rootPath());
+    QStringList filter;
+    filter << "*.txt";
+    pFSModel->setNameFilters(filter);
+    pFSModel->setNameFilterDisables(false);
+
     pTreeView->setModel(pFSModel);
-    pTreeView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+//    pTreeView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 //    pTreeView->header()->setStretchLastSection(false);
 
     pSplitter->addWidget(pTreeView);
@@ -36,8 +42,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(pTreeView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(slotSelectFile(const QModelIndex&)));
     connect(pTreeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(slotSelectFile(const QModelIndex&)));
-
-    connect(pViewerWidget, SIGNAL(signalSaveBMP(bool)), this, SLOT(slotSaveBmp(bool)));
 
     this->setWindowIcon(QIcon(":/atom"));
 }
@@ -113,14 +117,15 @@ void MainWindow::slotExportFile()
             else
                 error++;
         }
-        QApplication::restoreOverrideCursor();
+        QApplication::restoreOverrideCursor();QApplication::restoreOverrideCursor();
+
         QMessageBox::information(this, "Export", "Export " + QString::number(correct) + " file(s)<br>"
                                                                                         "Error export " + QString::number(error) + " file(s)");
     }
 }
 void MainWindow::slotAuthor()
 {
-    QString text = "<h3>WTF_Viewer 0.5.2 </h3> <br>"
+    QString text = "<h3>WTF_Viewer 0.5.5 </h3> <br>"
                    "WTF(What flies?)<br>"
                    "Author: Verbkin Mikhail <br>"
                    "Email: <a href=\"mailto:verbkinm@yandex.ru\" >verbkinm@yandex.ru</a> <br>"
@@ -138,23 +143,7 @@ void MainWindow::slotSelectFile(const QModelIndex& index)
     else
         pTreeView->expand(index);
 }
-void MainWindow::slotSaveBmp(bool state)
-{
-    QString name =  pFSModel->filePath(pTreeView->currentIndex()).replace(".txt", ".bmp");
-    QString fileName = QFileDialog::getSaveFileName(this,
-                                ("Save files"),
-                                name,
-                                "Images (*.bmp);;All files (*.*)");
 
-    QImage image(pViewerWidget->getColumnFromFile(fileName), pViewerWidget->getRowFromFile(fileName), QImage::Format_RGB32);
-
-    if(state)
-        image = pViewerWidget->getImageInversion();
-    else
-        image = pViewerWidget->getImage();
-
-    image.save(fileName, "BMP");
-}
 bool MainWindow::event(QEvent *event)
 {
 //    qDebug() << event->type();

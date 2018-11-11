@@ -30,18 +30,16 @@ SOURCES += \
     viewer\viewer_widget.cpp \
     eventfilter\eventfilter.cpp \
     export\export.cpp \
-    viewer/image.cpp \
-    viewer/my_graphicsscene.cpp \
-    eventfilter/fingerslide.cpp
+    eventfilter/fingerslide.cpp \
+    viewer/checkFile/checkfile.cpp
 
 HEADERS += \
         mainwindow.h \
     viewer\viewer_widget.h \
     eventfilter\eventfilter.h \
     export\export.h \
-    viewer/image.h \
-    viewer/my_graphicsscene.h \
-    eventfilter/fingerslide.h
+    eventfilter/fingerslide.h \
+    viewer/checkFile/checkfile.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
