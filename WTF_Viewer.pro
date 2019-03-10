@@ -27,19 +27,27 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    viewer\viewer_widget.cpp \
-    eventfilter\eventfilter.cpp \
-    export\export.cpp \
     eventfilter/fingerslide.cpp \
-    viewer/checkFile/checkfile.cpp
+    eventfilter/eventfilter.cpp \
+    export/export.cpp \
+    viewer/checkFile/checkfile.cpp \
+    viewer/frames/frames.cpp \
+    viewer/frames/oneframe.cpp \
+    viewer/viewer_widget.cpp \
+    progressbar.cpp \
+    viewer/clogfilterpanel.cpp
 
 HEADERS += \
-        mainwindow.h \
-    viewer\viewer_widget.h \
-    eventfilter\eventfilter.h \
-    export\export.h \
+    eventfilter/eventfilter.h \
     eventfilter/fingerslide.h \
-    viewer/checkFile/checkfile.h
+    export/export.h \
+    viewer/checkFile/checkfile.h \
+    viewer/frames/frames.h \
+    viewer/frames/oneframe.h \
+    viewer/viewer_widget.h \
+    mainwindow.h \
+    progressbar.h \
+    viewer/clogfilterpanel.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -48,7 +56,27 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 FORMS += \
     viewer\viewer_widget.ui \
-    export\export.ui
+    export/export.ui \
+    progressbar.ui \
+    viewer/clogfilterpanel.ui
 
 RESOURCES += \
     img.qrc
+
+SUBDIRS += \
+    WTF_Viewer.pro
+
+DISTFILES += \
+    img/atom.png \
+    img/author.png \
+    img/cut.png \
+    img/exit.png \
+    img/minus.png \
+    img/pen.png \
+    img/plus.png \
+    img/qt_logo.png \
+    img/reset.png \
+    img/rotate_minus.png \
+    img/rotate_plus.png \
+    img/save_as.png \
+    img/sekection_border.png

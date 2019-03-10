@@ -27,13 +27,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     pFSModel->setRootPath(QDir::rootPath());
     QStringList filter;
-    filter << "*.txt";
+    filter << "*.txt" << "*.clog";
     pFSModel->setNameFilters(filter);
     pFSModel->setNameFilterDisables(false);
 
+
     pTreeView->setModel(pFSModel);
-//    pTreeView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-//    pTreeView->header()->setStretchLastSection(false);
+    pTreeView->header()->hideSection(1);
+    pTreeView->header()->hideSection(2);
+    pTreeView->header()->hideSection(3);
+
 
     pSplitter->addWidget(pTreeView);
     pSplitter->addWidget(pViewerWidget);
@@ -44,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(pTreeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(slotSelectFile(const QModelIndex&)));
 
     this->setWindowIcon(QIcon(":/atom"));
+
 }
 void MainWindow::createMenu()
 {
@@ -125,7 +129,7 @@ void MainWindow::slotExportFile()
 }
 void MainWindow::slotAuthor()
 {
-    QString text = "<h3>WTF_Viewer 0.5.5 </h3> <br>"
+    QString text = "<h3>WTF_Viewer 0.7.0 </h3> <br>"
                    "WTF(What flies?)<br>"
                    "Author: Verbkin Mikhail <br>"
                    "Email: <a href=\"mailto:verbkinm@yandex.ru\" >verbkinm@yandex.ru</a> <br>"

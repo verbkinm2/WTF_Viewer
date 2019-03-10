@@ -27,7 +27,7 @@ QList<quint16> ListData::checkFile(QString fileName)
             QStringList splitString = QString(file.readLine()).remove("\r\n").split(" ");
             int countInLine = splitString.length();
 
-            //максимальное число элемента - 65535, все что больше будет = 0, отрицательные числа будут равны: 65536 минус само отрицательное число
+            //максимальное число элемента - 65535, все что больше будет = 0, отрицательные числа будут равны: 65536 плюс отрицательное число
             foreach (QString element, splitString)
                 list.append(element.toUShort());
 

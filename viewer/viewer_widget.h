@@ -9,6 +9,7 @@
 //#include <QGraphicsPathItem>
 
 #include "../eventfilter/fingerslide.h"
+#include "frames/frames.h"
 
 namespace Ui {
 class Viewer_widget;
@@ -22,8 +23,10 @@ public:
     explicit Viewer_widget(QWidget *parent = nullptr);
     ~Viewer_widget();
 
-    //получение Qimage из файла
+    //получение Qimage из txt файла
     QImage      getImageFromTxtFile     (QString fileName);
+    //получение Qimage из clog файла
+    QImage      getImageFromClogFile     (QString fileName);
     //установка картинки на виджет из файла
     void        setImageFile            (QString fileName);
     void        setImage                (QImage image);
@@ -43,8 +46,27 @@ signals:
 private:
     Ui::Viewer_widget *ui;
 
-    //объект, который хранит сам рисунок
+
+
+    enum fileType {UNDEFINED, TXT, CLOG};
+    fileType fType;
+
+//используется для нормального вращения QGraphicsView без сложных(для меня) модификаций QTransform
+    double angle = 0;
+
+//объект, который хранит сам рисунок
     QImage      imageOrigin;
+//фон
+    QImage      imageBackground;
+
+//указатели на item`ы
+    QGraphicsPixmapItem* itemBackground = nullptr;
+    QGraphicsPixmapItem* itemForeground = nullptr;
+    //рамка при выделении
+    QGraphicsRectItem*   itemRect       = nullptr;
+
+    //объект для хранения данных для работы с файлами clog
+    Frames frames;
 
     //двумерный массив с данными из файла
     quint16**       arrayOrigin             = nullptr;
@@ -60,7 +82,9 @@ private:
     QImage      createArrayImage        (const QString& fileName);
 
     //преобразование диапазонов
-    double      convert                 (double value,double From1,double From2,double To1,double To2);
+    double      convert                 (double value,
+                                         double From1, double From2,
+                                         double To1, double To2);
 
     //действия при не правильном файле
     void        incorrectFile           ();
@@ -82,6 +106,8 @@ private:
 
     void        disconnectSelectionSpinBox ();
     void        connectSelectionSpinBox ();
+
+    void        applyClogFilter(QImage& image);
 
 private slots:
     //поворот
@@ -113,6 +139,15 @@ private slots:
 
     // изменение выделения с помощью спинбоксов на панели
     void        slotMoveRectFromKey     ();
+
+    void        slotCreateRectItem(QGraphicsRectItem* item);
+
+    void        slotClogFilterRangeChange(QObject* obj, int value);
+
+    void        slotApplyClogFilter     ();
+
+    void        slotClogFilterRangeEnabled(QObject* obj);
+    void        slotClogFilterRangeDisabled(QObject* obj);
 
 protected:
 //    virtual void closeEvent(QCloseEvent *event);

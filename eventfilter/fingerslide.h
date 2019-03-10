@@ -47,6 +47,8 @@ signals:
     void siganlRect(QRect);
     void signalRectMove(QPoint);
 
+    void signalCreateRectItem(QGraphicsRectItem*);
+
 };
 
 #endif // FINGERSLIDE_H

@@ -18,6 +18,7 @@ bool FingerSlide::eventFilterScene(QObject* object, QEvent* event)
 {
     QGraphicsScene *scene = static_cast<QGraphicsScene*>(object);
     QGraphicsView* graphView = scene->views().at(0);
+//    QGraphicsView* graphView1 = scene->views().at(1);
 
 // Движение
     if(event->type() == QEvent::GraphicsSceneMouseMove)
@@ -54,14 +55,14 @@ bool FingerSlide::eventFilterScene(QObject* object, QEvent* event)
             QGraphicsRectItem* rectItem = scene->addRect(QRectF(QPointF(0,0), QSize(0,0)), \
                                                          QPen(QBrush(QColor(Qt::red)), 0));
             rectItem->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
-            rectItem->setZValue(1);
+            rectItem->setZValue(2);
+            emit signalCreateRectItem(rectItem);
         }
     }
 //Отжатие
     if(event->type() == QEvent::GraphicsSceneMouseRelease)
     {      
-        //доделать !!! при нажатии пмк - вылетает
-        if(graphView->scene()->items().length() > 1 )
+        if(graphView->scene()->items().length() > 2 )
         {
             QGraphicsRectItem* rectItem = static_cast<QGraphicsRectItem*>(scene->items().at(0));
             qreal x = rectItem->rect().x();
@@ -107,7 +108,7 @@ bool FingerSlide::eventFilterScene(QObject* object, QEvent* event)
 bool FingerSlide::eventFilterViewport(QObject* object, QEvent* event)
 {
     QGraphicsView* graphView = static_cast<QGraphicsView*>(object->parent());
-    QGraphicsScene *scene = graphView->scene();
+//    QGraphicsScene *scene = graphView->scene();
 // Колисо мышки
     if(event->type() == QEvent::Wheel)
         if(QApplication::keyboardModifiers() == Qt::ControlModifier)
@@ -140,7 +141,7 @@ bool FingerSlide::eventFilterViewport(QObject* object, QEvent* event)
 //        if(QApplication::mouseButtons() == Qt::LeftButton && graphView->cursor() == Qt::CrossCursor)
 //            return true;
         if(QApplication::mouseButtons() == Qt::LeftButton && \
-                (graphView->scene()->selectedItems().length() < 1 ) && \
+                (graphView->scene()->selectedItems().length() < 2 ) && \
                 graphView->cursor() != Qt::CrossCursor \
                 )
         {
