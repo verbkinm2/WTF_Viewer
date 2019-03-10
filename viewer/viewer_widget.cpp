@@ -70,7 +70,7 @@ Viewer_widget::Viewer_widget(QWidget *parent) :
     connect(ui->heigth_selection, SIGNAL(valueChanged(int)), this, SLOT(slotMoveRectFromKey()) );
 
     //
-    connect(ui->clogFilterPanel, SIGNAL(signalRangeChanged(QObject*, int)),   this, SLOT(slotClogFilterRangeChange(QObject*, int)));
+    connect(ui->clogFilterPanel, SIGNAL(signalRangeChanged(QObject*, quint16)),   this, SLOT(slotClogFilterRangeChange(QObject*, quint16)));
     connect(ui->clogFilterPanel, SIGNAL(signalApplyFilter()),       this, SLOT(slotApplyClogFilter()));
     connect(ui->clogFilterPanel, SIGNAL(signalRangeEnabled(QObject*)), this, SLOT(slotClogFilterRangeEnabled(QObject*)));
     connect(ui->clogFilterPanel, SIGNAL(signalRangeDisabled(QObject*)), this, SLOT(slotClogFilterRangeDisabled(QObject*)));
@@ -297,7 +297,7 @@ void Viewer_widget::connectSelectionSpinBox()
 
 void Viewer_widget::applyClogFilter(QImage& image)
 {
-    qDebug() << frames.getClusterRangeBegin() << frames.getClusterRangeEnd();
+//    qDebug() << frames.getClusterRangeBegin() << frames.getClusterRangeEnd();
 
     //обнуляем основной массив
    for (quint16 x = 0; x < column; ++x)
@@ -305,8 +305,8 @@ void Viewer_widget::applyClogFilter(QImage& image)
            arrayOrigin[x][y] = 0;
 
     quint16 max = 0;
-    for (uint frameNumber = 0; frameNumber < frames.getFrameCount(); ++frameNumber)
-        for (quint8 clusterNumber = 0; clusterNumber < frames.getClusterCount(frameNumber); ++clusterNumber) {
+    for (quint16 frameNumber = 0; frameNumber < frames.getFrameCount(); ++frameNumber)
+        for (quint16 clusterNumber = 0; clusterNumber < frames.getClusterCount(frameNumber); ++clusterNumber) {
             if( frames.clusterInRange(frames.getClusterLenght(frameNumber, clusterNumber)) &&
                 frames.totInRange(frameNumber, clusterNumber))
                 if(frames.isMediPix())
@@ -334,6 +334,8 @@ void Viewer_widget::applyClogFilter(QImage& image)
             QColor color(value, value, value);
             image.setPixelColor(x, y, color);
         }
+
+    ui->clogFilterPanel->setLabelMax(frames.getMaxCluster());
 }
 // !!!
 void Viewer_widget::slotMoveRectFromKey()
@@ -350,17 +352,17 @@ void Viewer_widget::slotCreateRectItem(QGraphicsRectItem * item)
     itemRect = item;
 }
 
-void Viewer_widget::slotClogFilterRangeChange(QObject *obj, int value)
+void Viewer_widget::slotClogFilterRangeChange(QObject *obj, quint16 value)
 {
     if(obj->objectName() == "clusterRangeBegin")
-        frames.setClusterRangeBegin(quint8(value));
+        frames.setClusterRangeBegin(value);
     if(obj->objectName() == "clusterRangeEnd")
-        frames.setClusterRangeEnd(quint8(value));
+        frames.setClusterRangeEnd(value);
 
     if(obj->objectName() == "totRangeBegin")
-        frames.setTotRangeBegin(quint8(value));
+        frames.setTotRangeBegin(value);
     if(obj->objectName() == "totrRangeBegin")
-        frames.setTotRangeBegin(quint8(value));
+        frames.setTotRangeBegin(value);
 }
 
 void Viewer_widget::slotApplyClogFilter()
@@ -481,14 +483,6 @@ QImage Viewer_widget::createArrayImage(const QString& fileName)
     if(column == 0 || row == 0 || column-1 > 65535 || row-1 > 65535)
         return QImage(QSize(0,0),QImage::Format_Invalid);
 
-    //Временный массив для данных преобразованного диапазона
-//    quint16** array;
-
-    //выделяем память для временного массива
-//    array = new quint16 *[column];
-//    for (quint16 i = 0; i < column; ++i)
-//        array[i] = new quint16[row];
-
     //выделяем память для основного массива
     arrayOrigin = new quint16 *[column];
     for (quint16 i = 0; i < column; ++i)
@@ -505,17 +499,6 @@ QImage Viewer_widget::createArrayImage(const QString& fileName)
             arrayOrigin[x][y] = value;
             max < value ? max = value : NULL ;
         }
-
-    // преобразование диапазонов
-//    for (quint16 y = 0; y < row; ++y)
-//        for (quint16 x = 0; x < column; ++x) {
-//            quint16 value = quint16(convert(double(arrayOrigin[x][y]), \
-//                                            double(0), \
-//                                            double(max), \
-//                                            double(0), \
-//                                            double(255) ) + 0.5);
-//            array[x][y] = value;
-//        }
 
     //наполнение объекта QImage
     for (quint16 x = 0; x < column; ++x)

@@ -47,6 +47,9 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
+         <property name="movable">
+          <bool>true</bool>
+         </property>
          <widget class="QWidget" name="twrProperty">
           <attribute name="title">
            <string>Pic Property</string>
@@ -60,6 +63,9 @@
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
                <widget class="QPushButton" name="selection_button">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="toolTip">
                  <string>draw selection</string>
                 </property>
@@ -487,7 +493,7 @@
           <item>
            <widget class="QPushButton" name="save_bmp">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="toolTip">
              <string>save picture to BMP file</string>
@@ -526,7 +532,7 @@
           <item>
            <widget class="QPushButton" name="rotate_plus">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="toolTip">
              <string>+90º</string>
@@ -542,6 +548,9 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="angle">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="wrapping">
              <bool>false</bool>
             </property>
@@ -574,7 +583,7 @@
           <item>
            <widget class="QPushButton" name="rotate_minus">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="toolTip">
              <string>-90º</string>
@@ -664,6 +673,19 @@
               <normaloff>:/minus</normaloff>:/minus</iconset>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>
@@ -848,6 +870,36 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>inversion</tabstop>
+  <tabstop>graphicsView</tabstop>
+  <tabstop>tabWidgetRight</tabstop>
+  <tabstop>selection_button</tabstop>
+  <tabstop>edit_button</tabstop>
+  <tabstop>cut_button</tabstop>
+  <tabstop>x</tabstop>
+  <tabstop>y</tabstop>
+  <tabstop>data</tabstop>
+  <tabstop>width</tabstop>
+  <tabstop>heigth</tabstop>
+  <tabstop>x_selection</tabstop>
+  <tabstop>y_selection</tabstop>
+  <tabstop>width_selection</tabstop>
+  <tabstop>heigth_selection</tabstop>
+  <tabstop>save_bmp</tabstop>
+  <tabstop>save_txt</tabstop>
+  <tabstop>rotate_plus</tabstop>
+  <tabstop>angle</tabstop>
+  <tabstop>rotate_minus</tabstop>
+  <tabstop>reset_transform</tabstop>
+  <tabstop>scaled_plus</tabstop>
+  <tabstop>scaled_minus</tabstop>
+  <tabstop>graphicsView_Origin</tabstop>
+  <tabstop>graphicsView_Result</tabstop>
+  <tabstop>graphicsView_Mask</tabstop>
+  <tabstop>textEdit</tabstop>
+ </tabstops>
  <resources>
   <include location="../img.qrc"/>
  </resources>

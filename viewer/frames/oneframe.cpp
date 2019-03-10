@@ -40,14 +40,14 @@ void OneFrame::addEPoint(cluster &inClaster, quint8 x, quint8 y, quint16 tot)
 //    return inClaster.last();
 }
 
-uint OneFrame::getClusterCount()
+quint16 OneFrame::getClusterCount()
 {
-    return uint(list.length());
+    return quint16(list.length());
 }
 
-quint8 OneFrame::getClusterLenght(uint clusterNumber)
+quint16 OneFrame::getClusterLenght(uint clusterNumber)
 {
-    return  quint8(list.at(int(clusterNumber)).length());
+    return  quint16(list.at(int(clusterNumber)).length());
 }
 
 uint OneFrame::getEventCountInCluster(uint clusterNumber)

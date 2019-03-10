@@ -19,9 +19,9 @@ public:
     void    appendEPoint    (ePoint point);
     void    appendEPoint    (quint8 x, quint8 y, quint16 tot);
 
-    uint    getFrameCount   ();
-    uint    getClusterCount (uint frameNumber);
-    quint8  getClusterLenght(uint frameNumber, quint8 clusterNumber);
+    quint16 getFrameCount();
+    quint16 getClusterCount(quint16 frameNumber);
+    quint16  getClusterLenght(quint16 frameNumber, quint16 clusterNumber);
     uint    getEventCountInCluster(uint frameNumber, uint clusterNumber);
 //    const quint16    &getMax();
 //    const quint16    &getMin();
@@ -29,7 +29,7 @@ public:
 
     void    setFile         (QString path);
 
-    void    setClusterRange (quint8 begin, quint8 end);
+    void    setClusterRange (quint16 begin, quint16 end);
     void    setTotRange     (quint16 begin, quint16 end);
 
     void    resetClusterRange();
@@ -44,8 +44,8 @@ public:
     void    clear           ();
     const QList<OneFrame>&  getList();
 
-    bool    clusterInRange  (quint8 clusterLength);
-    bool    totInRange      (uint frameNumber, quint8 clusterNumber);
+    bool    clusterInRange  (quint16 clusterLength);
+    bool    totInRange      (uint frameNumber, quint16 clusterNumber);
 
     quint16  getClusterRangeBegin() const;
     void    setClusterRangeBegin(const quint16 &value);
@@ -66,7 +66,7 @@ private:
     QList<OneFrame> list;
 
     quint16  clusterRangeBegin   = 0;
-    quint16  clusterRangeEnd     = std::numeric_limits<quint8>::max();
+    quint16  clusterRangeEnd     = std::numeric_limits<quint16>::max();
 
     quint16 totRangeBegin       = 0;
     quint16 totRangeEnd         = std::numeric_limits<quint16>::max();

@@ -2,6 +2,7 @@
 #define CLOGFILTERPANEL_H
 
 #include <QWidget>
+#include <QEvent>
 
 namespace Ui {
 class ClogFilterPanel;
@@ -27,6 +28,8 @@ public:
     quint16 getTotEnd() const;
     void    setTotEnd(int value);
 
+    void    setLabelMax(quint16 value);
+
     bool    isClusterEnable();
     bool    isTotEnable();
 
@@ -40,10 +43,18 @@ private slots:
     void    slotCheckIntersection   (int value);
 
 signals:
-    void    signalRangeChanged      (QObject* obj, int value);
+    void    signalRangeChanged      (QObject* obj, quint16 value);
     void    signalApplyFilter       ();
     void    signalRangeEnabled      (QObject*);
     void    signalRangeDisabled     (QObject*);
+
+protected:
+
+//    virtual bool event(QEvent *event);
+
+    virtual void keyReleaseEvent(QKeyEvent *event);
+
+
 };
 
 #endif // CLOGFILTERPANEL_H

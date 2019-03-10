@@ -31,12 +31,12 @@ void Frames::appendEPoint(quint8 x, quint8 y, quint16 tot)
     list.last().appendEPoint(x, y, tot);
 }
 
-uint Frames::getFrameCount()
+quint16 Frames::getFrameCount()
 {
-    return uint(list.length());
+    return quint16(list.length());
 }
 
-uint Frames::getClusterCount(uint frameNumber)
+quint16 Frames::getClusterCount(quint16 frameNumber)
 {
     if(frameNumber > uint(list.length() - 1))
     {
@@ -48,7 +48,7 @@ uint Frames::getClusterCount(uint frameNumber)
     return frame.getClusterCount();
 }
 
-quint8 Frames::getClusterLenght(uint frameNumber, quint8 clusterNumber)
+quint16 Frames::getClusterLenght(quint16 frameNumber, quint16 clusterNumber)
 {
     OneFrame frame = list.at(int(frameNumber));
     return frame.getClusterLenght(clusterNumber);
@@ -130,7 +130,7 @@ void Frames::setFile(QString path)
     emit signalFramesCreated();
 }
 
-void Frames::setClusterRange(quint8 begin, quint8 end)
+void Frames::setClusterRange(quint16 begin, quint16 end)
 {
     clusterRangeBegin = begin;
     clusterRangeEnd   = end;
@@ -202,7 +202,7 @@ const QList<OneFrame> &Frames::getList()
     return list;
 }
 
-bool Frames::clusterInRange(quint8 clusterLength)
+bool Frames::clusterInRange(quint16 clusterLength)
 {
     if(clusterLength >= clusterRangeBegin && clusterLength <= clusterRangeEnd)
         return true;
@@ -210,7 +210,7 @@ bool Frames::clusterInRange(quint8 clusterLength)
     return false;
 }
 
-bool Frames::totInRange(uint frameNumber, quint8 clusterNumber)
+bool Frames::totInRange(uint frameNumber, quint16 clusterNumber)
 {
     OneFrame frame = list.at(int(frameNumber));
     foreach (ePoint point, frame.getList().at(int(clusterNumber)))

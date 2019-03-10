@@ -35,8 +35,8 @@ public:
     void addCluster();
     void addEPoint(cluster &inClaster, quint8 x, quint8 y, quint16 tot);
 
-    uint getClusterCount();
-    quint8 getClusterLenght(uint clusterNumber);
+    quint16 getClusterCount();
+    quint16 getClusterLenght(uint clusterNumber);
     uint getEventCountInCluster(uint clusterNumber);
     const QList<cluster>&
          getList();

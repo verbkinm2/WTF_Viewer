@@ -129,7 +129,7 @@ void MainWindow::slotExportFile()
 }
 void MainWindow::slotAuthor()
 {
-    QString text = "<h3>WTF_Viewer 0.7.0 </h3> <br>"
+    QString text = "<h3>WTF_Viewer 0.7.1 </h3> <br>"
                    "WTF(What flies?)<br>"
                    "Author: Verbkin Mikhail <br>"
                    "Email: <a href=\"mailto:verbkinm@yandex.ru\" >verbkinm@yandex.ru</a> <br>"

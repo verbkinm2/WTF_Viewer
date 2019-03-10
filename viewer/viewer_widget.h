@@ -142,7 +142,7 @@ private slots:
 
     void        slotCreateRectItem(QGraphicsRectItem* item);
 
-    void        slotClogFilterRangeChange(QObject* obj, int value);
+    void        slotClogFilterRangeChange(QObject* obj, quint16 value);
 
     void        slotApplyClogFilter     ();
 

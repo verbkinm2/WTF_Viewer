@@ -1,6 +1,7 @@
 #include "clogfilterpanel.h"
 #include "ui_clogfilterpanel.h"
 
+#include <QKeyEvent>
 #include <QDebug>
 
 ClogFilterPanel::ClogFilterPanel(QWidget *parent) :
@@ -74,6 +75,11 @@ void ClogFilterPanel::setTotEnd(int value)
     ui->totRangeEnd->setValue(value);
 }
 
+void ClogFilterPanel::setLabelMax(quint16 value)
+{
+    ui->clusterLabel->setText("max: " + QString::number(value));
+}
+
 bool ClogFilterPanel::isClusterEnable()
 {
     return ui->clusterRangeGroup->isChecked();
@@ -140,5 +146,23 @@ void ClogFilterPanel::slotCheckIntersection(int value)
         if(value <= ui->totRangeBegin->value())
             sp->setValue(++value);
 
-    emit signalRangeChanged(sender(), value);
+    emit signalRangeChanged(sender(), quint16(value));
 }
+
+void ClogFilterPanel::keyReleaseEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+        emit signalApplyFilter();
+}
+
+//bool ClogFilterPanel::event(QEvent *event)
+//{
+//    if(event->type() == QEvent::KeyRelease)
+//    {
+//        QKeyEvent* kEv = static_cast<QKeyEvent*>(event);
+//        if(kEv->key() == Qt::Key_Enter)
+//            emit signalApplyFilter();
+//    }
+
+//    return QWidget::event(event);
+//}
