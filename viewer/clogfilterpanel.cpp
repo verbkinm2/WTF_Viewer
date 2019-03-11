@@ -19,6 +19,9 @@ ClogFilterPanel::ClogFilterPanel(QWidget *parent) :
     connect(ui->totRangeBegin,      SIGNAL(valueChanged(int)), this, SLOT(slotCheckIntersection(int)));
     connect(ui->totRangeEnd,        SIGNAL(valueChanged(int)), this, SLOT(slotCheckIntersection(int)));
 
+    connect(ui->midiPixRadioButton, SIGNAL(toggled(bool)),      this,SLOT(slotPixGroupFilter(bool)));
+//    connect(ui->timePixRadioButton, SIGNAL(toggled(bool)),      this,SLOT(slotPixGroupFilter(bool)));
+
     connect(ui->apply,              SIGNAL(clicked()),          this, SIGNAL(signalApplyFilter()) );
 }
 
@@ -27,22 +30,21 @@ ClogFilterPanel::~ClogFilterPanel()
     delete ui;
 }
 
-void ClogFilterPanel::setClusterRangeMaximum(int value)
+void ClogFilterPanel::setClusterRange(int max, int min)
 {
-    ui->clusterRangeBegin->setMinimum(1);
-    ui->clusterRangeBegin->setMaximum(value - 1);
-
-    ui->clusterRangeEnd->setMinimum(ui->clusterRangeBegin->minimum() + 1);
-    ui->clusterRangeEnd->setMaximum(value);
+    ui->clusterRangeBegin->setRange(min, max);
+    ui->clusterRangeEnd->setRange(min, max);
 }
 
-void ClogFilterPanel::setTotRangeMaximum(int value)
+void ClogFilterPanel::setTotRange(int max, int min)
 {
-    ui->totRangeBegin->setMinimum(1);
-    ui->totRangeBegin->setMaximum(value - 1);
+    ui->totRangeBegin->setRange(min, max);
+    ui->totRangeEnd->setRange(min, max);
+}
 
-    ui->totRangeEnd->setMinimum(ui->totRangeBegin->minimum() + 1);
-    ui->totRangeEnd->setMaximum(value);
+void ClogFilterPanel::setClusterBegin(int value)
+{
+    ui->clusterRangeBegin->setValue(value);
 }
 
 void ClogFilterPanel::setClusterEnd(int value)
@@ -70,14 +72,26 @@ quint16 ClogFilterPanel::getTotEnd() const
     return quint16(ui->totRangeEnd->value());
 }
 
+void ClogFilterPanel::setTotBegin(int value)
+{
+    ui->totRangeBegin->setValue(value);
+}
+
 void ClogFilterPanel::setTotEnd(int value)
 {
     ui->totRangeEnd->setValue(value);
 }
 
-void ClogFilterPanel::setLabelMax(quint16 value)
+void ClogFilterPanel::setLabelClusterMaxMin(quint16 max, quint16 min)
 {
-    ui->clusterLabel->setText("max: " + QString::number(value));
+    ui->clusterLabel->setText("min: " + QString::number(min) +
+                              "; max: " + QString::number(max) + ";");
+}
+
+void ClogFilterPanel::setLabelTotMaxMin(quint16 max, quint16 min)
+{
+    ui->totLabel->setText("min: " + QString::number(min) +
+                              "; max: " + QString::number(max) + ";");
 }
 
 bool ClogFilterPanel::isClusterEnable()
@@ -131,22 +145,28 @@ void ClogFilterPanel::slotCheckIntersection(int value)
     QSpinBox* sp = static_cast<QSpinBox*>(sender());
 
     if(sp->objectName() == "clusterRangeBegin")
-        if(value >= ui->clusterRangeEnd->value())
-            sp->setValue(--value);
+        if(value > ui->clusterRangeEnd->value())
+            sp->setValue(ui->clusterRangeEnd->value());
 
     if(sp->objectName() == "clusterRangeEnd")
-        if(value <= ui->clusterRangeBegin->value())
-            sp->setValue(++value);
+        if(value < ui->clusterRangeBegin->value())
+            sp->setValue(ui->clusterRangeBegin->value());
 
     if(sp->objectName() == "totRangeBegin")
-        if(value >= ui->totRangeEnd->value())
-            sp->setValue(--value);
+        if(value > ui->totRangeEnd->value())
+            sp->setValue(ui->totRangeEnd->value());
 
     if(sp->objectName() == "totRangeEnd")
-        if(value <= ui->totRangeBegin->value())
-            sp->setValue(++value);
+        if(value < ui->totRangeBegin->value())
+            sp->setValue(ui->totRangeBegin->value());
 
     emit signalRangeChanged(sender(), quint16(value));
+}
+
+void ClogFilterPanel::slotPixGroupFilter(bool checked)
+{
+    emit signalPixGroupMidiPixSet(checked);
+    emit signalApplyFilter();
 }
 
 void ClogFilterPanel::keyReleaseEvent(QKeyEvent *event)

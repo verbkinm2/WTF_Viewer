@@ -78,7 +78,7 @@
       <item row="3" column="0" colspan="2">
        <widget class="QLabel" name="clusterLabel">
         <property name="text">
-         <string>max: </string>
+         <string>max: ; min: ;</string>
         </property>
        </widget>
       </item>
@@ -100,10 +100,10 @@
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>From</string>
+         <string>To</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -117,20 +117,27 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_4">
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="totRangeEnd">
+        <property name="toolTip">
+         <string>tot to...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>To</string>
+         <string>From</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="totRangeEnd">
-        <property name="toolTip">
-         <string>tot to...</string>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="totLabel">
+        <property name="text">
+         <string>max: ; min: ;</string>
         </property>
        </widget>
       </item>
@@ -159,7 +166,7 @@
       <item>
        <widget class="QRadioButton" name="timePixRadioButton">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="toolTip">
          <string>TImePix filter</string>

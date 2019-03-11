@@ -5,6 +5,8 @@
 #include <QHeaderView>
 #include <QDebug>
 
+const QString VERSION =  "0.7.2";
+
 #ifdef Q_OS_Linux
     #define SPLITTER_PATH "/"
 #endif
@@ -47,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(pTreeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(slotSelectFile(const QModelIndex&)));
 
     this->setWindowIcon(QIcon(":/atom"));
+
+    this->setWindowTitle("WTF_Viewer " + VERSION);
 
 }
 void MainWindow::createMenu()
@@ -129,7 +133,7 @@ void MainWindow::slotExportFile()
 }
 void MainWindow::slotAuthor()
 {
-    QString text = "<h3>WTF_Viewer 0.7.1 </h3> <br>"
+    QString text = "<h3>WTF_Viewer " + VERSION + "</h3> <br>"
                    "WTF(What flies?)<br>"
                    "Author: Verbkin Mikhail <br>"
                    "Email: <a href=\"mailto:verbkinm@yandex.ru\" >verbkinm@yandex.ru</a> <br>"

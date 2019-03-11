@@ -21,7 +21,7 @@ public:
 
     quint16 getFrameCount();
     quint16 getClusterCount(quint16 frameNumber);
-    quint16  getClusterLenght(quint16 frameNumber, quint16 clusterNumber);
+    quint16 getClusterLenght(quint16 frameNumber, quint16 clusterNumber);
     uint    getEventCountInCluster(uint frameNumber, uint clusterNumber);
 //    const quint16    &getMax();
 //    const quint16    &getMin();
@@ -62,6 +62,10 @@ public:
     quint16 getTotRangeEnd() const;
     void setTotRangeEnd(const quint16 &value);
 
+    quint16 getMinTot() const;
+
+    quint16 getMinCluster() const;
+
 private:
     QList<OneFrame> list;
 
@@ -77,6 +81,11 @@ private:
     //максимальное и минимальное значение ToT во всех фреймах
     quint16    maxTot           = 0;
     quint16    maxCluster       = 0;
+    quint16    minTot           = std::numeric_limits<quint16>::max();
+    quint16    minCluster       = std::numeric_limits<quint16>::max();
+
+private slots:
+    void    slotSetMediPix(bool checked);
 
 signals:
     void signalFrameCreated(int);

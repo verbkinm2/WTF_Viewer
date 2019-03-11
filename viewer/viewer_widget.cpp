@@ -15,6 +15,8 @@
 
 #include <QDebug>
 
+#define CLOG_SIZE 256
+
 Viewer_widget::Viewer_widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Viewer_widget)
@@ -74,6 +76,7 @@ Viewer_widget::Viewer_widget(QWidget *parent) :
     connect(ui->clogFilterPanel, SIGNAL(signalApplyFilter()),       this, SLOT(slotApplyClogFilter()));
     connect(ui->clogFilterPanel, SIGNAL(signalRangeEnabled(QObject*)), this, SLOT(slotClogFilterRangeEnabled(QObject*)));
     connect(ui->clogFilterPanel, SIGNAL(signalRangeDisabled(QObject*)), this, SLOT(slotClogFilterRangeDisabled(QObject*)));
+    connect(ui->clogFilterPanel, SIGNAL(signalPixGroupMidiPixSet(bool)), &frames, SLOT(slotSetMediPix(bool)));
 
     //при первом запуске - вывести на экран надпись и отключить всё не нужное
     incorrectFile();
@@ -121,8 +124,8 @@ QImage Viewer_widget::getImageFromClogFile(QString fileName)
 
     frames.setFile(fileName);
 
-    column  = 256;
-    row     = 256;
+    column  = CLOG_SIZE;
+    row     = CLOG_SIZE;
 
     QImage image(column, row, QImage::Format_ARGB32_Premultiplied);
     image.fill(Qt::black);
@@ -189,13 +192,20 @@ void Viewer_widget::setEnableButtonPanel(bool state)
     {
         ui->tabWidgetRight->setTabEnabled(1, true);
 
-        ui->clogFilterPanel->setClusterRangeMaximum(frames.getMaxCluster());
-        if( !(ui->clogFilterPanel->isClusterEnable()))
-            ui->clogFilterPanel->setClusterEnd(frames.getMaxCluster());
+        ui->clogFilterPanel->setClusterRange(frames.getMaxCluster(), frames.getMinCluster());
 
-        ui->clogFilterPanel->setTotRangeMaximum(frames.getMaxTot());
+        if( !(ui->clogFilterPanel->isClusterEnable()))
+        {
+            ui->clogFilterPanel->setClusterBegin(frames.getMinCluster());
+            ui->clogFilterPanel->setClusterEnd(frames.getMaxCluster());
+        }
+
+        ui->clogFilterPanel->setTotRange(frames.getMaxTot(), frames.getMinTot());
         if( !(ui->clogFilterPanel->isTotEnable()))
+        {
+            ui->clogFilterPanel->setTotBegin(frames.getMinTot());
             ui->clogFilterPanel->setTotEnd(frames.getMaxTot());
+        }
     }
 
 
@@ -250,8 +260,6 @@ void Viewer_widget::setImage(QImage image)
         connect(eventFilterScene, SIGNAL(signalRelease()), this, SLOT(slotFinishSelection()));
 
         connect(eventFilterScene, SIGNAL(signalCreateRectItem(QGraphicsRectItem*)), this, SLOT(slotCreateRectItem(QGraphicsRectItem*)));
-
-//        QApplication::restoreOverrideCursor();
     }
     else
         incorrectFile();
@@ -297,8 +305,6 @@ void Viewer_widget::connectSelectionSpinBox()
 
 void Viewer_widget::applyClogFilter(QImage& image)
 {
-//    qDebug() << frames.getClusterRangeBegin() << frames.getClusterRangeEnd();
-
     //обнуляем основной массив
    for (quint16 x = 0; x < column; ++x)
        for (quint16 y = 0; y < row; ++y)
@@ -306,21 +312,27 @@ void Viewer_widget::applyClogFilter(QImage& image)
 
     quint16 max = 0;
     for (quint16 frameNumber = 0; frameNumber < frames.getFrameCount(); ++frameNumber)
-        for (quint16 clusterNumber = 0; clusterNumber < frames.getClusterCount(frameNumber); ++clusterNumber) {
+        for (quint16 clusterNumber = 0; clusterNumber < frames.getClusterCount(frameNumber); ++clusterNumber)
+        {
             if( frames.clusterInRange(frames.getClusterLenght(frameNumber, clusterNumber)) &&
                 frames.totInRange(frameNumber, clusterNumber))
-                if(frames.isMediPix())
-                {
-                    for (uint eventNumber = 0; eventNumber < frames.getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber) {
+                    for (uint eventNumber = 0; eventNumber < frames.getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber)
+                    {
                         ePoint point = frames.getEPoint(frameNumber, clusterNumber, eventNumber);
-                        arrayOrigin[point.x][point.y] += 1;
+                        //если координаты точек выходят за границы - это просто игнорируется
+                        if(point.x >= column || point.y >= row)
+                            continue;
+                        //Выбор режима - MediPix or TimePix
+                        if(frames.isMediPix())
+                            arrayOrigin[point.x][point.y] += 1;
+                        else if(frames.isTimePix())
+                            arrayOrigin[point.x][point.y] += point.tot;
+
+                        //максимальное значение для дальнейшего преобразования диапазонов
                         if(max < arrayOrigin[point.x][point.y])
-                        {
                             max = arrayOrigin[point.x][point.y];
-                        }
                     }
 
-                }
         }
 
     //наполнение объекта QImage
@@ -335,7 +347,8 @@ void Viewer_widget::applyClogFilter(QImage& image)
             image.setPixelColor(x, y, color);
         }
 
-    ui->clogFilterPanel->setLabelMax(frames.getMaxCluster());
+    ui->clogFilterPanel->setLabelClusterMaxMin(frames.getMaxCluster(), frames.getMinCluster());
+    ui->clogFilterPanel->setLabelTotMaxMin(frames.getMaxTot(), frames.getMinTot());
 }
 // !!!
 void Viewer_widget::slotMoveRectFromKey()
@@ -361,8 +374,8 @@ void Viewer_widget::slotClogFilterRangeChange(QObject *obj, quint16 value)
 
     if(obj->objectName() == "totRangeBegin")
         frames.setTotRangeBegin(value);
-    if(obj->objectName() == "totrRangeBegin")
-        frames.setTotRangeBegin(value);
+    if(obj->objectName() == "totRangeEnd")
+        frames.setTotRangeEnd(value);
 }
 
 void Viewer_widget::slotApplyClogFilter()
@@ -399,13 +412,14 @@ void Viewer_widget::slotClogFilterRangeDisabled(QObject *obj)
 {
     QGroupBox* groupBox = static_cast<QGroupBox*>(obj);
 
-    if(groupBox->objectName() == "clusterRangeGroup"){
-        frames.setClusterRangeBegin(1);
+    if(groupBox->objectName() == "clusterRangeGroup")
+    {
+        frames.setClusterRangeBegin(frames.getMinCluster());
         frames.setClusterRangeEnd(frames.getMaxCluster());
     }
     else if(groupBox->objectName() == "totRangeGroup")
     {
-        frames.setTotRangeBegin(1);
+        frames.setTotRangeBegin(frames.getMinTot());
         frames.setTotRangeEnd(frames.getMaxTot());
     }
 }

@@ -60,16 +60,6 @@ uint Frames::getEventCountInCluster(uint frameNumber, uint clusterNumber)
     return frame.getEventCountInCluster(clusterNumber);
 }
 
-//const quint16 &Frames::getMax()
-//{
-//    return max;
-//}
-
-//const quint16 &Frames::getMin()
-//{
-//    return min;
-//}
-
 ePoint Frames::getEPoint(uint frameNumber, uint clusterNumber, uint eventNumber) const
 {
     OneFrame frame = list.at(int(frameNumber));
@@ -121,7 +111,11 @@ void Frames::setFile(QString path)
                              tot);
                 if(maxCluster < i) maxCluster = i;
                 if(maxTot < tot) maxTot = tot;
+
+
+                if(minTot > tot) minTot = tot;
             }
+            if(minCluster > i) minCluster = i;
         }
     }
     file.close();
@@ -194,7 +188,9 @@ void Frames::clear()
 
     list.clear();
     maxCluster  = 0;
+    minCluster  = std::numeric_limits<quint16>::max();
     maxTot      = 0;
+    minTot      = std::numeric_limits<quint16>::max();
 }
 
 const QList<OneFrame> &Frames::getList()
@@ -268,4 +264,19 @@ quint16 Frames::getTotRangeEnd() const
 void Frames::setTotRangeEnd(const quint16 &value)
 {
     totRangeEnd = value;
+}
+
+quint16 Frames::getMinTot() const
+{
+    return minTot;
+}
+
+quint16 Frames::getMinCluster() const
+{
+    return minCluster;
+}
+
+void Frames::slotSetMediPix(bool checked)
+{
+    setMediPix(checked);
 }

@@ -16,9 +16,10 @@ public:
     explicit ClogFilterPanel(QWidget *parent = nullptr);
     ~ClogFilterPanel();
 
-    void    setClusterRangeMaximum(int value);
-    void    setTotRangeMaximum(int value);
+    void    setClusterRange(int max, int min);
+    void    setTotRange(int max, int min);
 
+    void    setClusterBegin(int value);
     void    setClusterEnd(int value);
 
     quint16 getClusterBegin() const;
@@ -26,9 +27,12 @@ public:
 
     quint16 getTotBegin() const;
     quint16 getTotEnd() const;
+
+    void    setTotBegin(int value);
     void    setTotEnd(int value);
 
-    void    setLabelMax(quint16 value);
+    void    setLabelClusterMaxMin(quint16 max, quint16 min);
+    void    setLabelTotMaxMin(quint16 max, quint16 min);
 
     bool    isClusterEnable();
     bool    isTotEnable();
@@ -42,15 +46,17 @@ private slots:
     void    slotEnableRange();
     void    slotCheckIntersection   (int value);
 
+    void    slotPixGroupFilter(bool checked);
+
 signals:
     void    signalRangeChanged      (QObject* obj, quint16 value);
     void    signalApplyFilter       ();
     void    signalRangeEnabled      (QObject*);
     void    signalRangeDisabled     (QObject*);
 
-protected:
+    void    signalPixGroupMidiPixSet(bool);
 
-//    virtual bool event(QEvent *event);
+protected:
 
     virtual void keyReleaseEvent(QKeyEvent *event);
 
