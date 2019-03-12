@@ -185,6 +185,7 @@ void Viewer_widget::setEnableButtonPanel(bool state)
 {
     ui->button_panel->setEnabled(state);
     ui->inversion->setEnabled(state);
+    ui->data_panel->setEnabled(state);
 
     ui->tabWidgetRight->setEnabled(state);
 
@@ -211,9 +212,9 @@ void Viewer_widget::setEnableButtonPanel(bool state)
     }
 
 
-//    ui->data_panel->setEnabled(state);
 //    ui->edit_panel->setEnabled(state);
 
+    //state
     setEnableDataPanelSelection(false);
 }
 void Viewer_widget::setImage(QImage image)
