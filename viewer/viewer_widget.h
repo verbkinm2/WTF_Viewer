@@ -120,6 +120,8 @@ private slots:
     void        slotScaleWheel          (int);
     //сохранинеие в bmp
     void        slotSaveBMP             ();
+    //сохранинеие в txt
+    void        slotSaveTXT             ();
     //отрисовка imageOrigin в зависимости от значения checkBox'а Inversion
     void        slotInversionCheckBox   (int state);
 

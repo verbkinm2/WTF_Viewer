@@ -493,7 +493,7 @@
           <item>
            <widget class="QPushButton" name="save_bmp">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="toolTip">
              <string>save picture to BMP file</string>
@@ -506,7 +506,7 @@
           <item>
            <widget class="QPushButton" name="save_txt">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="toolTip">
              <string>save picture to TXT file</string>

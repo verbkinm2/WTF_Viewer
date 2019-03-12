@@ -37,6 +37,8 @@ Viewer_widget::Viewer_widget(QWidget *parent) :
 
     //сохранение в bmp
     connect(ui->save_bmp, SIGNAL(clicked()), this, SLOT(slotSaveBMP()));
+    //сохранение в txt
+    connect(ui->save_txt, SIGNAL(clicked()), this, SLOT(slotSaveTXT()));
 
     //инверсия цвета
     connect(ui->inversion, SIGNAL(stateChanged(int)), this, SLOT(slotInversionCheckBox(int)));
@@ -798,9 +800,10 @@ void Viewer_widget::slotScaled()
 void Viewer_widget::slotSaveBMP()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
-                                                    ("Save files"),
+                                                    ("Save file"),
                                                     QDir::rootPath(),
                                                     "Images (*.bmp);;All files (*.*)");
+
 
     QImage image(column, row, QImage::Format_RGB32);
 
@@ -810,6 +813,29 @@ void Viewer_widget::slotSaveBMP()
         image = this->getImage();
 
     image.save(fileName, "BMP");
+}
+
+void Viewer_widget::slotSaveTXT()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    ("Save file"),
+                                                    QDir::rootPath(),
+                                                    "TXT (*.txt);;All files (*.*)");
+
+    QFile file(fileName);
+    QTextStream writeStrime(&file);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+    for (int x = 0; x < row; ++x)
+    {
+        for (int y = 0; y < column; ++y) {
+            if(y != 0)
+                writeStrime << " ";
+            writeStrime << QString::number(arrayOrigin[y][x]);
+        }
+        writeStrime << "\n";
+        writeStrime.flush();
+    }
+    file.close();
 }
 //void Viewer_widget::closeEvent(QCloseEvent *event)
 //{
