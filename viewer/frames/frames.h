@@ -46,6 +46,7 @@ public:
 
     bool    clusterInRange  (quint16 clusterLength);
     bool    totInRange      (uint frameNumber, quint16 clusterNumber);
+    QList<ePoint> getListTotInRange(uint frameNumber, quint16 clusterNumber) const;
 
     quint16  getClusterRangeBegin() const;
     void    setClusterRangeBegin(const quint16 &value);
@@ -66,6 +67,10 @@ public:
 
     quint16 getMinCluster() const;
 
+    bool getAllTotInCluster() const;
+    bool isAllTotInCluster() const;
+    void setAllTotInCluster(bool value);
+
 private:
     QList<OneFrame> list;
 
@@ -77,6 +82,7 @@ private:
 
     bool    mediPix             = true;
     bool    timePix             = false;
+    bool    allTotInCluster     = true;
 
     //максимальное и минимальное значение ToT во всех фреймах
     quint16    maxTot           = 0;
@@ -86,6 +92,7 @@ private:
 
 private slots:
     void    slotSetMediPix(bool checked);
+//    void    slotSetAllTotInCluster(bool checked);
 
 signals:
     void signalFrameCreated(int);

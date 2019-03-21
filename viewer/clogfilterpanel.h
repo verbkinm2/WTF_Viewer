@@ -36,6 +36,7 @@ public:
 
     bool    isClusterEnable();
     bool    isTotEnable();
+    bool    isAllTotInCluster();
 
 //    void    setCluster
 
@@ -55,6 +56,7 @@ signals:
     void    signalRangeDisabled     (QObject*);
 
     void    signalPixGroupMidiPixSet(bool);
+    void    signalAllTotInClusterToggled(bool);
 
 protected:
 

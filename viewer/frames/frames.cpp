@@ -211,9 +211,26 @@ bool Frames::totInRange(uint frameNumber, quint16 clusterNumber)
     OneFrame frame = list.at(int(frameNumber));
     foreach (ePoint point, frame.getList().at(int(clusterNumber)))
         if(point.tot >= totRangeBegin && point.tot <= totRangeEnd)
+        {
             return true;
+        }
 
     return false;
+}
+
+QList<ePoint> Frames::getListTotInRange(uint frameNumber, quint16 clusterNumber) const
+{
+    OneFrame frame = list.at(int(frameNumber));
+    QList<ePoint> listePoint;
+    listePoint.clear();
+
+    foreach (ePoint point, frame.getList().at(int(clusterNumber)))
+        if(point.tot >= totRangeBegin && point.tot <= totRangeEnd){
+            listePoint << point;
+//            qDebug() << point.x << point.y << point.tot;
+        }
+
+    return listePoint;
 }
 
 quint16 Frames::getClusterRangeBegin() const
@@ -276,7 +293,27 @@ quint16 Frames::getMinCluster() const
     return minCluster;
 }
 
+bool Frames::getAllTotInCluster() const
+{
+    return allTotInCluster;
+}
+
+bool Frames::isAllTotInCluster() const
+{
+    return getAllTotInCluster();
+}
+
+void Frames::setAllTotInCluster(bool value)
+{
+    allTotInCluster = value;
+}
+
 void Frames::slotSetMediPix(bool checked)
 {
     setMediPix(checked);
 }
+
+//void Frames::slotSetAllTotInCluster(bool checked)
+//{
+//    setAllTotInCluster(checked);
+//}

@@ -35,7 +35,8 @@ SOURCES += \
     viewer/frames/oneframe.cpp \
     viewer/viewer_widget.cpp \
     progressbar.cpp \
-    viewer/clogfilterpanel.cpp
+    viewer/clogfilterpanel.cpp \
+    graph/graphdialog.cpp
 
 HEADERS += \
     eventfilter/eventfilter.h \
@@ -47,7 +48,8 @@ HEADERS += \
     viewer/viewer_widget.h \
     mainwindow.h \
     progressbar.h \
-    viewer/clogfilterpanel.h
+    viewer/clogfilterpanel.h \
+    graph/graphdialog.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -58,7 +60,8 @@ FORMS += \
     viewer\viewer_widget.ui \
     export/export.ui \
     progressbar.ui \
-    viewer/clogfilterpanel.ui
+    viewer/clogfilterpanel.ui \
+    graph/graphdialog.ui
 
 RESOURCES += \
     img.qrc
@@ -78,5 +81,4 @@ DISTFILES += \
     img/reset.png \
     img/rotate_minus.png \
     img/rotate_plus.png \
-    img/save_as.png \
     img/sekection_border.png

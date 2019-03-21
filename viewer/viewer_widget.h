@@ -40,6 +40,8 @@ public:
     int         getColumnFromFile       (QString fileName);
     int         getRowFromFile          (QString fileName);
 
+    Frames* getFrames();
+
 signals:
 
 
@@ -108,6 +110,7 @@ private:
     void        connectSelectionSpinBox ();
 
     void        applyClogFilter(QImage& image);
+    void        applyClogFilterAdditionalFunction(const ePoint & point, quint16 & max);
 
 private slots:
     //поворот
@@ -150,6 +153,8 @@ private slots:
 
     void        slotClogFilterRangeEnabled(QObject* obj);
     void        slotClogFilterRangeDisabled(QObject* obj);
+
+    void        slotSetAllTotInCluster(bool value);
 
 protected:
 //    virtual void closeEvent(QCloseEvent *event);

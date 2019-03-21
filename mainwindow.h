@@ -36,6 +36,7 @@ private:
 
     QMenu*              pMenuFile       = nullptr;
     QMenu*              pMenuAbout      = nullptr;
+    QMenu*              pMenuGraph      = nullptr;
 
     void createMenu();
 
@@ -46,6 +47,7 @@ private slots:
     void slotSelectFile(const QModelIndex&);
 
     void slotAuthor();
+    void slotPlotGraph();
 
     void slotExportFile();
 };

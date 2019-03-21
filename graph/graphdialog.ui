@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GraphDialog</class>
+ <widget class="QDialog" name="GraphDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>254</width>
+    <height>234</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Plot graph </string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../img.qrc">
+    <normaloff>:/atom</normaloff>:/atom</iconset>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>X:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="DataX">
+     <property name="toolTip">
+      <string>list data for X axis</string>
+     </property>
+     <property name="whatsThis">
+      <string>list data for X axis</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Y:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="DataY">
+     <property name="toolTip">
+      <string>list data for Y axis</string>
+     </property>
+     <property name="whatsThis">
+      <string>list data for Y axis</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QCheckBox" name="newWindow">
+     <property name="toolTip">
+      <string>create graph in new window</string>
+     </property>
+     <property name="whatsThis">
+      <string>create graph in new window</string>
+     </property>
+     <property name="text">
+      <string>new window</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="tristate">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QCheckBox" name="drawPoint">
+     <property name="toolTip">
+      <string>draw point on graph</string>
+     </property>
+     <property name="whatsThis">
+      <string>draw point on graph</string>
+     </property>
+     <property name="text">
+      <string>draw point</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QCheckBox" name="toEnergy">
+     <property name="toolTip">
+      <string>transfer to energy</string>
+     </property>
+     <property name="whatsThis">
+      <string>transfer to energy</string>
+     </property>
+     <property name="text">
+      <string>to energy</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QGroupBox" name="coefficients">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QDoubleSpinBox" name="A">
+        <property name="toolTip">
+         <string>coefficient A</string>
+        </property>
+        <property name="whatsThis">
+         <string>coefficient A</string>
+        </property>
+        <property name="prefix">
+         <string>A=</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="B">
+        <property name="toolTip">
+         <string>coefficient B</string>
+        </property>
+        <property name="whatsThis">
+         <string>coefficient B</string>
+        </property>
+        <property name="prefix">
+         <string>B=</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QDoubleSpinBox" name="C">
+        <property name="toolTip">
+         <string>coefficient C</string>
+        </property>
+        <property name="prefix">
+         <string>C=</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="T">
+        <property name="toolTip">
+         <string>coefficient T</string>
+        </property>
+        <property name="whatsThis">
+         <string>coefficient T</string>
+        </property>
+        <property name="prefix">
+         <string>T=</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="toolTip">
+      <string>create the grap or cancel</string>
+     </property>
+     <property name="whatsThis">
+      <string>create the grap or cancel</string>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../img.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>GraphDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>244</x>
+     <y>224</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>GraphDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>244</x>
+     <y>224</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -23,6 +23,7 @@ ClogFilterPanel::ClogFilterPanel(QWidget *parent) :
 //    connect(ui->timePixRadioButton, SIGNAL(toggled(bool)),      this,SLOT(slotPixGroupFilter(bool)));
 
     connect(ui->apply,              SIGNAL(clicked()),          this, SIGNAL(signalApplyFilter()) );
+    connect(ui->allTotInCluster,    SIGNAL(toggled(bool)),       this, SIGNAL(signalAllTotInClusterToggled(bool)));
 }
 
 ClogFilterPanel::~ClogFilterPanel()
@@ -104,6 +105,11 @@ bool ClogFilterPanel::isTotEnable()
     return ui->totRangeGroup->isChecked();
 }
 
+bool ClogFilterPanel::isAllTotInCluster()
+{
+    return ui->allTotInCluster->isChecked();
+}
+
 void ClogFilterPanel::slotEnableRange()
 {
     QGroupBox* groupBox = static_cast<QGroupBox*>(sender());
@@ -129,12 +135,15 @@ void ClogFilterPanel::slotEnableRange()
         {
             ui->totRangeBegin->setEnabled(true);
             ui->totRangeEnd->setEnabled(true);
+            ui->allTotInCluster->setEnabled(true);
             emit signalRangeEnabled(sender());
         }
         else
         {
             ui->totRangeBegin->setEnabled(false);
             ui->totRangeEnd->setEnabled(false);
+            ui->allTotInCluster->setEnabled(false);
+            ui->allTotInCluster->setChecked(true);
             emit signalRangeDisabled(sender());
         }
     }

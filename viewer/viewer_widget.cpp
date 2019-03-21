@@ -79,6 +79,7 @@ Viewer_widget::Viewer_widget(QWidget *parent) :
     connect(ui->clogFilterPanel, SIGNAL(signalRangeEnabled(QObject*)), this, SLOT(slotClogFilterRangeEnabled(QObject*)));
     connect(ui->clogFilterPanel, SIGNAL(signalRangeDisabled(QObject*)), this, SLOT(slotClogFilterRangeDisabled(QObject*)));
     connect(ui->clogFilterPanel, SIGNAL(signalPixGroupMidiPixSet(bool)), &frames, SLOT(slotSetMediPix(bool)));
+    connect(ui->clogFilterPanel, SIGNAL(signalAllTotInClusterToggled(bool)), this, SLOT(slotSetAllTotInCluster(bool)));
 
     //при первом запуске - вывести на экран надпись и отключить всё не нужное
     incorrectFile();
@@ -101,6 +102,12 @@ int Viewer_widget::getRowFromFile(QString fileName)
 {
     return ListData(fileName).row;
 }
+
+Frames *Viewer_widget::getFrames()
+{
+    return &frames;
+}
+
 QImage Viewer_widget::getImageFromTxtFile(QString fileName)
 {
     return createArrayImage(fileName);
@@ -319,23 +326,20 @@ void Viewer_widget::applyClogFilter(QImage& image)
         {
             if( frames.clusterInRange(frames.getClusterLenght(frameNumber, clusterNumber)) &&
                 frames.totInRange(frameNumber, clusterNumber))
+            {
+                if(frames.isAllTotInCluster())
                     for (uint eventNumber = 0; eventNumber < frames.getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber)
                     {
                         ePoint point = frames.getEPoint(frameNumber, clusterNumber, eventNumber);
-                        //если координаты точек выходят за границы - это просто игнорируется
-                        if(point.x >= column || point.y >= row)
-                            continue;
-                        //Выбор режима - MediPix or TimePix
-                        if(frames.isMediPix())
-                            arrayOrigin[point.x][point.y] += 1;
-                        else if(frames.isTimePix())
-                            arrayOrigin[point.x][point.y] += point.tot;
-
-                        //максимальное значение для дальнейшего преобразования диапазонов
-                        if(max < arrayOrigin[point.x][point.y])
-                            max = arrayOrigin[point.x][point.y];
+                        applyClogFilterAdditionalFunction(point, max);
                     }
-
+                else
+                {
+                    QList<ePoint> listePoint = frames.getListTotInRange(frameNumber, clusterNumber);
+                    foreach (ePoint point, listePoint)
+                        applyClogFilterAdditionalFunction(point, max);
+                }
+            }
         }
 
     //наполнение объекта QImage
@@ -352,6 +356,21 @@ void Viewer_widget::applyClogFilter(QImage& image)
 
     ui->clogFilterPanel->setLabelClusterMaxMin(frames.getMaxCluster(), frames.getMinCluster());
     ui->clogFilterPanel->setLabelTotMaxMin(frames.getMaxTot(), frames.getMinTot());
+}
+//для меньшего кол-ва строк исполбзуем эту функцию
+void Viewer_widget::applyClogFilterAdditionalFunction(const ePoint &point, quint16 &max)
+{
+    //если координаты точек выходят за границы - это просто игнорируется
+    if(point.x >= column || point.y >= row)
+        return;
+    //Выбор режима - MediPix or TimePix
+    if(frames.isMediPix())
+        arrayOrigin[point.x][point.y] += 1;
+    else if(frames.isTimePix())
+        arrayOrigin[point.x][point.y] += point.tot;
+    //максимальное значение для дальнейшего преобразования диапазонов
+    if(max < arrayOrigin[point.x][point.y])
+        max = arrayOrigin[point.x][point.y];
 }
 // !!!
 void Viewer_widget::slotMoveRectFromKey()
@@ -425,6 +444,12 @@ void Viewer_widget::slotClogFilterRangeDisabled(QObject *obj)
         frames.setTotRangeBegin(frames.getMinTot());
         frames.setTotRangeEnd(frames.getMaxTot());
     }
+}
+
+void Viewer_widget::slotSetAllTotInCluster(bool value)
+{
+    frames.setAllTotInCluster(value);
+    slotApplyClogFilter();
 }
 
 //void Viewer_widget::slotOpened(int tab)

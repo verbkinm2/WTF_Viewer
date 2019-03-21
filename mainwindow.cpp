@@ -1,11 +1,12 @@
 #include "mainwindow.h"
 #include "export\export.h"
+#include "graph/graphdialog.h"
 
 #include <QApplication>
 #include <QHeaderView>
 #include <QDebug>
 
-const QString VERSION =  "0.8.0";
+const QString VERSION =  "0.8.1";
 
 #ifdef Q_OS_Linux
     #define SPLITTER_PATH "/"
@@ -38,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     pTreeView->header()->hideSection(1);
     pTreeView->header()->hideSection(2);
     pTreeView->header()->hideSection(3);
+    pTreeView->setAnimated(true);
 
 
     pSplitter->addWidget(pTreeView);
@@ -66,7 +68,12 @@ void MainWindow::createMenu()
     pMenuAbout->addAction(QIcon(":/author"),"Author", this, SLOT(slotAuthor()));
     pMenuAbout->addAction(QIcon(":/qt_logo"), "About Qt", QApplication::instance(), SLOT(aboutQt()));
 
+    pMenuGraph = new QMenu("Graph");
+    pMenuGraph->addAction(QIcon(":/graph"), "Plot the graph", this, SLOT(slotPlotGraph()));
+    pMenuGraph->setDisabled(true);
+
     this->menuBar()->addMenu(pMenuFile);
+    this->menuBar()->addMenu(pMenuGraph);
     this->menuBar()->addMenu(pMenuAbout);
 }
 void MainWindow::slotExportFile()
@@ -142,14 +149,34 @@ void MainWindow::slotAuthor()
 
     QMessageBox::about(this, "Author", text);
 }
+
+void MainWindow::slotPlotGraph()
+{
+    GraphDialog* gb = new GraphDialog(pViewerWidget->getFrames()->getMinCluster(),
+                                      pViewerWidget->getFrames()->getMaxCluster(),
+                                      this);
+    if(gb->exec() == QDialog::Accepted)
+    {
+        gb->show();
+    }
+
+    delete gb;
+}
 void MainWindow::slotSelectFile(const QModelIndex& index)
 {
+    QFileInfo file(pFSModel->filePath(index));
+
     this->statusBar()->showMessage(pFSModel->filePath(index));
     pViewerWidget->setImageFile(pFSModel->filePath(index));
     if(pTreeView->isExpanded(index))
         pTreeView->collapse(index);
     else
         pTreeView->expand(index);
+
+    if(file.suffix() == "clog")
+        pMenuGraph->setEnabled(true);
+    else
+        pMenuGraph->setDisabled(true);
 }
 
 bool MainWindow::event(QEvent *event)
