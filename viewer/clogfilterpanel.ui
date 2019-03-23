@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>158</width>
-    <height>274</height>
+    <height>297</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,11 +42,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="2" column="1">
-       <widget class="QSpinBox" name="clusterRangeEnd">
-        <property name="toolTip">
-         <string>cluster to...</string>
-        </property>
-       </widget>
+       <widget class="QComboBox" name="clusterRangeEnd"/>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label">
@@ -69,18 +65,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QSpinBox" name="clusterRangeBegin">
-        <property name="toolTip">
-         <string>cluster from...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QLabel" name="clusterLabel">
-        <property name="text">
-         <string>max: ; min: ;</string>
-        </property>
-       </widget>
+       <widget class="QComboBox" name="clusterRangeBegin"/>
       </item>
      </layout>
     </widget>
@@ -101,18 +86,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="1" column="1">
-       <widget class="QSpinBox" name="totRangeBegin">
-        <property name="toolTip">
-         <string>tot from...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QSpinBox" name="totRangeEnd">
-        <property name="toolTip">
-         <string>tot to...</string>
-        </property>
-       </widget>
+       <widget class="QComboBox" name="totRangeBegin"/>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_3">
@@ -124,22 +98,8 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QLabel" name="totLabel">
-        <property name="text">
-         <string>max: ; min: ;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>To</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="totRangeEnd"/>
       </item>
       <item row="0" column="0" colspan="2">
        <widget class="QCheckBox" name="allTotInCluster">
@@ -151,6 +111,16 @@
         </property>
         <property name="checked">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>To</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -206,11 +176,7 @@
  </widget>
  <tabstops>
   <tabstop>clusterRangeGroup</tabstop>
-  <tabstop>clusterRangeBegin</tabstop>
-  <tabstop>clusterRangeEnd</tabstop>
   <tabstop>totRangeGroup</tabstop>
-  <tabstop>totRangeBegin</tabstop>
-  <tabstop>totRangeEnd</tabstop>
   <tabstop>midiPixRadioButton</tabstop>
   <tabstop>timePixRadioButton</tabstop>
   <tabstop>apply</tabstop>

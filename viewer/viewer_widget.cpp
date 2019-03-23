@@ -74,12 +74,10 @@ Viewer_widget::Viewer_widget(QWidget *parent) :
     connect(ui->heigth_selection, SIGNAL(valueChanged(int)), this, SLOT(slotMoveRectFromKey()) );
 
     //
-    connect(ui->clogFilterPanel, SIGNAL(signalRangeChanged(QObject*, quint16)),   this, SLOT(slotClogFilterRangeChange(QObject*, quint16)));
+//    connect(ui->clogFilterPanel, SIGNAL(signalRangeChanged(QObject*, quint16)),   this, SLOT(slotClogFilterRangeChange(QObject*, quint16)));
     connect(ui->clogFilterPanel, SIGNAL(signalApplyFilter()),       this, SLOT(slotApplyClogFilter()));
-    connect(ui->clogFilterPanel, SIGNAL(signalRangeEnabled(QObject*)), this, SLOT(slotClogFilterRangeEnabled(QObject*)));
-    connect(ui->clogFilterPanel, SIGNAL(signalRangeDisabled(QObject*)), this, SLOT(slotClogFilterRangeDisabled(QObject*)));
-    connect(ui->clogFilterPanel, SIGNAL(signalPixGroupMidiPixSet(bool)), &frames, SLOT(slotSetMediPix(bool)));
-    connect(ui->clogFilterPanel, SIGNAL(signalAllTotInClusterToggled(bool)), this, SLOT(slotSetAllTotInCluster(bool)));
+//    connect(ui->clogFilterPanel, SIGNAL(signalPixGroupMidiPixSet(bool)), &frames, SLOT(slotSetMediPix(bool)));
+//    connect(ui->clogFilterPanel, SIGNAL(signalAllTotInClusterToggled(bool)), this, SLOT(slotSetAllTotInCluster(bool)));
 
     //при первом запуске - вывести на экран надпись и отключить всё не нужное
     incorrectFile();
@@ -115,7 +113,6 @@ QImage Viewer_widget::getImageFromTxtFile(QString fileName)
 
 QImage Viewer_widget::getImageFromClogFile(QString fileName)
 {
-//    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFile file(fileName);
     file.open(QFile::ReadOnly);
     uint lines = 0;
@@ -132,6 +129,7 @@ QImage Viewer_widget::getImageFromClogFile(QString fileName)
     progressBar.show();
 
     frames.setFile(fileName);
+    setEnableButtonPanel(true);
 
     column  = CLOG_SIZE;
     row     = CLOG_SIZE;
@@ -202,24 +200,10 @@ void Viewer_widget::setEnableButtonPanel(bool state)
     {
         ui->tabWidgetRight->setTabEnabled(1, true);
 
-        ui->clogFilterPanel->setClusterRange(frames.getMaxCluster(), frames.getMinCluster());
-
-        if( !(ui->clogFilterPanel->isClusterEnable()))
-        {
-            ui->clogFilterPanel->setClusterBegin(frames.getMinCluster());
-            ui->clogFilterPanel->setClusterEnd(frames.getMaxCluster());
-        }
-
-        ui->clogFilterPanel->setTotRange(frames.getMaxTot(), frames.getMinTot());
-        if( !(ui->clogFilterPanel->isTotEnable()))
-        {
-            ui->clogFilterPanel->setTotBegin(frames.getMinTot());
-            ui->clogFilterPanel->setTotEnd(frames.getMaxTot());
-        }
+        ui->clogFilterPanel->setClusterRange(frames.getClustersLenghtList());
+        ui->clogFilterPanel->setTotRange(frames.getTotLenghtList());
     }
 
-
-//    ui->edit_panel->setEnabled(state);
 
     //state
     setEnableDataPanelSelection(false);
@@ -324,18 +308,21 @@ void Viewer_widget::applyClogFilter(QImage& image)
     for (quint16 frameNumber = 0; frameNumber < frames.getFrameCount(); ++frameNumber)
         for (quint16 clusterNumber = 0; clusterNumber < frames.getClusterCount(frameNumber); ++clusterNumber)
         {
-            if( frames.clusterInRange(frames.getClusterLenght(frameNumber, clusterNumber)) &&
-                frames.totInRange(frameNumber, clusterNumber))
+            if( frames.clusterInRange(frames.getClusterLenght(frameNumber, clusterNumber),
+                                      ui->clogFilterPanel->getClusterBegin(), ui->clogFilterPanel->getClusterEnd()) &&
+                frames.totInRange(frameNumber, clusterNumber,
+                                  ui->clogFilterPanel->getTotBegin(), ui->clogFilterPanel->getTotEnd()))
             {
-                if(frames.isAllTotInCluster())
-                    for (uint eventNumber = 0; eventNumber < frames.getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber)
+                if(ui->clogFilterPanel->isAllTotInCluster())
+                    for (quint16 eventNumber = 0; eventNumber < frames.getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber)
                     {
                         ePoint point = frames.getEPoint(frameNumber, clusterNumber, eventNumber);
                         applyClogFilterAdditionalFunction(point, max);
                     }
                 else
                 {
-                    QList<ePoint> listePoint = frames.getListTotInRange(frameNumber, clusterNumber);
+                    QList<ePoint> listePoint = frames.getListTotInRange(frameNumber, clusterNumber,
+                                                                        ui->clogFilterPanel->getTotBegin(), ui->clogFilterPanel->getTotEnd());
                     foreach (ePoint point, listePoint)
                         applyClogFilterAdditionalFunction(point, max);
                 }
@@ -353,9 +340,6 @@ void Viewer_widget::applyClogFilter(QImage& image)
             QColor color(value, value, value);
             image.setPixelColor(x, y, color);
         }
-
-    ui->clogFilterPanel->setLabelClusterMaxMin(frames.getMaxCluster(), frames.getMinCluster());
-    ui->clogFilterPanel->setLabelTotMaxMin(frames.getMaxTot(), frames.getMinTot());
 }
 //для меньшего кол-ва строк исполбзуем эту функцию
 void Viewer_widget::applyClogFilterAdditionalFunction(const ePoint &point, quint16 &max)
@@ -364,9 +348,9 @@ void Viewer_widget::applyClogFilterAdditionalFunction(const ePoint &point, quint
     if(point.x >= column || point.y >= row)
         return;
     //Выбор режима - MediPix or TimePix
-    if(frames.isMediPix())
+    if(ui->clogFilterPanel->isMediPix())
         arrayOrigin[point.x][point.y] += 1;
-    else if(frames.isTimePix())
+    else
         arrayOrigin[point.x][point.y] += point.tot;
     //максимальное значение для дальнейшего преобразования диапазонов
     if(max < arrayOrigin[point.x][point.y])
@@ -387,18 +371,19 @@ void Viewer_widget::slotCreateRectItem(QGraphicsRectItem * item)
     itemRect = item;
 }
 
-void Viewer_widget::slotClogFilterRangeChange(QObject *obj, quint16 value)
-{
-    if(obj->objectName() == "clusterRangeBegin")
-        frames.setClusterRangeBegin(value);
-    if(obj->objectName() == "clusterRangeEnd")
-        frames.setClusterRangeEnd(value);
+//void Viewer_widget::slotClogFilterRangeChange(QObject *obj, quint16 value)
+//{
+//    qDebug() << obj->objectName() << value;
 
-    if(obj->objectName() == "totRangeBegin")
-        frames.setTotRangeBegin(value);
-    if(obj->objectName() == "totRangeEnd")
-        frames.setTotRangeEnd(value);
-}
+//    if(obj->objectName() == "clusterRangeBegin")
+//        frames.setClusterRangeBegin(value);
+//    else if(obj->objectName() == "clusterRangeEnd")
+//        frames.setClusterRangeEnd(value);
+//    else if(obj->objectName() == "totRangeBegin")
+//        frames.setTotRangeBegin(value);
+//    else if(obj->objectName() == "totRangeEnd")
+//        frames.setTotRangeEnd(value);
+//}
 
 void Viewer_widget::slotApplyClogFilter()
 {
@@ -414,52 +399,11 @@ void Viewer_widget::slotApplyClogFilter()
     QApplication::restoreOverrideCursor();
 }
 
-void Viewer_widget::slotClogFilterRangeEnabled(QObject *obj)
-{
-    QGroupBox* groupBox = static_cast<QGroupBox*>(obj);
-
-    if(groupBox->objectName() == "clusterRangeGroup")
-    {
-        frames.setClusterRangeBegin(ui->clogFilterPanel->getClusterBegin());
-        frames.setClusterRangeEnd(ui->clogFilterPanel->getClusterEnd());
-    }
-    else if(groupBox->objectName() == "totRangeGroup")
-    {
-        frames.setTotRangeBegin(ui->clogFilterPanel->getTotBegin());
-        frames.setTotRangeEnd(ui->clogFilterPanel->getTotEnd());
-    }
-}
-
-void Viewer_widget::slotClogFilterRangeDisabled(QObject *obj)
-{
-    QGroupBox* groupBox = static_cast<QGroupBox*>(obj);
-
-    if(groupBox->objectName() == "clusterRangeGroup")
-    {
-        frames.setClusterRangeBegin(frames.getMinCluster());
-        frames.setClusterRangeEnd(frames.getMaxCluster());
-    }
-    else if(groupBox->objectName() == "totRangeGroup")
-    {
-        frames.setTotRangeBegin(frames.getMinTot());
-        frames.setTotRangeEnd(frames.getMaxTot());
-    }
-}
-
-void Viewer_widget::slotSetAllTotInCluster(bool value)
-{
-    frames.setAllTotInCluster(value);
-    slotApplyClogFilter();
-}
-
-//void Viewer_widget::slotOpened(int tab)
+//void Viewer_widget::slotSetAllTotInCluster(bool value)
 //{
-//    if( tab == 1){
-//        ui->graphicsView_Origin->fitInView(imageOrigin.rect(), Qt::KeepAspectRatio);
-//        disconnect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(slotOpened(int)));
-//    }
-
+//    frames.setAllTotInCluster(value);
 //}
+
 void Viewer_widget::slotViewSelectionMovePos(QPoint point)
 {
     disconnectSelectionSpinBox();
@@ -554,11 +498,6 @@ QImage Viewer_widget::createArrayImage(const QString& fileName)
             image.setPixelColor(x, y, color);
         }
 
-    //удаление временного массива
-//    for (int i = 0; i < column; ++i)
-//        delete[] array[i];
-//    delete[] array;
-
     return image;
 }
 double Viewer_widget::convert(double value, double From1, double From2, double To1, double To2)
@@ -620,8 +559,6 @@ void Viewer_widget::slotSelectionFrame()
     {
         setEnableDataPanelSelection(true);
 
-//        if(scene.items().length() > 2)
-//            scene.removeItem(scene.items().at(0));
         if(itemRect){
             scene.removeItem(itemRect);
             itemRect = nullptr;

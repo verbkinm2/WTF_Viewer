@@ -37,11 +37,11 @@ public:
 
     quint16 getClusterCount();
     quint16 getClusterLenght(uint clusterNumber);
-    uint getEventCountInCluster(uint clusterNumber);
+    quint16 getEventCountInCluster(uint clusterNumber);
     const QList<cluster>&
          getList();
 
-    const ePoint &getEPoint(uint clusterNumber, uint eventNumber);
+    const ePoint &getEPoint(quint16 clusterNumber, quint16 eventNumber);
 
     void    clear();
 

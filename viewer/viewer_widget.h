@@ -147,14 +147,11 @@ private slots:
 
     void        slotCreateRectItem(QGraphicsRectItem* item);
 
-    void        slotClogFilterRangeChange(QObject* obj, quint16 value);
+//    void        slotClogFilterRangeChange(QObject* obj, quint16 value);
 
     void        slotApplyClogFilter     ();
 
-    void        slotClogFilterRangeEnabled(QObject* obj);
-    void        slotClogFilterRangeDisabled(QObject* obj);
-
-    void        slotSetAllTotInCluster(bool value);
+//    void        slotSetAllTotInCluster(bool value);
 
 protected:
 //    virtual void closeEvent(QCloseEvent *event);

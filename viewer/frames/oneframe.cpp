@@ -50,14 +50,14 @@ quint16 OneFrame::getClusterLenght(uint clusterNumber)
     return  quint16(list.at(int(clusterNumber)).length());
 }
 
-uint OneFrame::getEventCountInCluster(uint clusterNumber)
+quint16 OneFrame::getEventCountInCluster(uint clusterNumber)
 {
     if(clusterNumber > uint(list.length() - 1)){
         qDebug() << "error in " << Q_FUNC_INFO << __FILE__ << "line: " << __LINE__;
         exit(1);
     }
 
-    return uint(list.at(int(clusterNumber)).length());
+    return quint16(list.at(int(clusterNumber)).length());
 }
 
 const QList<cluster> &OneFrame::getList()
@@ -65,7 +65,7 @@ const QList<cluster> &OneFrame::getList()
     return list;
 }
 
-const ePoint &OneFrame::getEPoint(uint clusterNumber, uint eventNumber)
+const ePoint &OneFrame::getEPoint(quint16 clusterNumber, quint16 eventNumber)
 {
     if(clusterNumber > uint(list.length() - 1) ||
            eventNumber > uint(list.at(int(clusterNumber)).length()))

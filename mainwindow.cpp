@@ -6,7 +6,7 @@
 #include <QHeaderView>
 #include <QDebug>
 
-const QString VERSION =  "0.8.1";
+const QString VERSION =  "0.8.2";
 
 #ifdef Q_OS_Linux
     #define SPLITTER_PATH "/"
@@ -152,9 +152,7 @@ void MainWindow::slotAuthor()
 
 void MainWindow::slotPlotGraph()
 {
-    GraphDialog* gb = new GraphDialog(pViewerWidget->getFrames()->getMinCluster(),
-                                      pViewerWidget->getFrames()->getMaxCluster(),
-                                      this);
+    GraphDialog* gb = new GraphDialog(pViewerWidget->getFrames(), this);
     if(gb->exec() == QDialog::Accepted)
     {
         gb->show();

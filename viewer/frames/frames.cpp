@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QApplication>
 #include <QFileInfo>
+#include <QVector>
 
 #include "iostream"
 
@@ -54,13 +55,13 @@ quint16 Frames::getClusterLenght(quint16 frameNumber, quint16 clusterNumber)
     return frame.getClusterLenght(clusterNumber);
 }
 
-uint Frames::getEventCountInCluster(uint frameNumber, uint clusterNumber)
+quint16 Frames::getEventCountInCluster(quint16 frameNumber, quint16 clusterNumber)
 {
     OneFrame frame = list.at(int(frameNumber));
     return frame.getEventCountInCluster(clusterNumber);
 }
 
-ePoint Frames::getEPoint(uint frameNumber, uint clusterNumber, uint eventNumber) const
+ePoint Frames::getEPoint(quint16 frameNumber, quint16 clusterNumber, quint16 eventNumber) const
 {
     OneFrame frame = list.at(int(frameNumber));
     return frame.getEPoint(clusterNumber, eventNumber);
@@ -109,77 +110,58 @@ void Frames::setFile(QString path)
                 appendEPoint(quint8(point.at(0).toInt()),
                              quint8(point.at(1).toInt()),
                              tot);
-                if(maxCluster < i) maxCluster = i;
-                if(maxTot < tot) maxTot = tot;
-
-
-                if(minTot > tot) minTot = tot;
             }
-            if(minCluster > i) minCluster = i;
         }
     }
     file.close();
-//    qDebug() << "MIN = " << min;
-//    qDebug() << "MAX = " << max;
+
     emit signalFramesCreated();
 }
 
-void Frames::setClusterRange(quint16 begin, quint16 end)
-{
-    clusterRangeBegin = begin;
-    clusterRangeEnd   = end;
-}
+//void Frames::resetClusterRange()
+//{
+//    clusterRangeBegin = 0;
+//    clusterRangeEnd   = std::numeric_limits<quint8>::max();;
+//}
 
-void Frames::setTotRange(quint16 begin, quint16 end)
-{
-    totRangeBegin   = begin;
-    totRangeEnd     = end;
-}
+//void Frames::resetTotRange()
+//{
+//    totRangeBegin   = 0;
+//    totRangeEnd     = std::numeric_limits<quint16>::max();
+//}
 
-void Frames::resetClusterRange()
-{
-    clusterRangeBegin = 0;
-    clusterRangeEnd   = std::numeric_limits<quint8>::max();;
-}
+//void Frames::setMediPix(bool enable)
+//{
+//    if(enable){
+//        mediPix = true;
+//        timePix = false;
+//    }
+//    else {
+//        mediPix = false;
+//        timePix = true;
+//    }
+//}
 
-void Frames::resetTotRange()
-{
-    totRangeBegin   = 0;
-    totRangeEnd     = std::numeric_limits<quint16>::max();
-}
+//void Frames::setTimePix(bool enable)
+//{
+//    setMediPix(!enable);
+//}
 
-void Frames::setMediPix(bool enable)
-{
-    if(enable){
-        mediPix = true;
-        timePix = false;
-    }
-    else {
-        mediPix = false;
-        timePix = true;
-    }
-}
+//bool Frames::isMediPix()
+//{
+//    if(mediPix)
+//        return true;
 
-void Frames::setTimePix(bool enable)
-{
-    setMediPix(!enable);
-}
+//    return false;
+//}
 
-bool Frames::isMediPix()
-{
-    if(mediPix)
-        return true;
+//bool Frames::isTimePix()
+//{
+//    if(timePix)
+//        return true;
 
-    return false;
-}
-
-bool Frames::isTimePix()
-{
-    if(timePix)
-        return true;
-
-    return false;
-}
+//    return false;
+//}
 
 void Frames::clear()
 {
@@ -187,10 +169,9 @@ void Frames::clear()
         oneFrame.clear();
 
     list.clear();
-    maxCluster  = 0;
-    minCluster  = std::numeric_limits<quint16>::max();
-    maxTot      = 0;
-    minTot      = std::numeric_limits<quint16>::max();
+
+//    resetClusterRange();
+//    resetTotRange();
 }
 
 const QList<OneFrame> &Frames::getList()
@@ -198,7 +179,7 @@ const QList<OneFrame> &Frames::getList()
     return list;
 }
 
-bool Frames::clusterInRange(quint16 clusterLength)
+bool Frames::clusterInRange(quint16 clusterLength, quint16 clusterRangeBegin, quint16 clusterRangeEnd)
 {
     if(clusterLength >= clusterRangeBegin && clusterLength <= clusterRangeEnd)
         return true;
@@ -206,114 +187,118 @@ bool Frames::clusterInRange(quint16 clusterLength)
     return false;
 }
 
-bool Frames::totInRange(uint frameNumber, quint16 clusterNumber)
+bool Frames::totInRange(uint frameNumber, quint16 clusterNumber, quint16 totRangeBegin, quint16 totRangeEnd)
 {
     OneFrame frame = list.at(int(frameNumber));
     foreach (ePoint point, frame.getList().at(int(clusterNumber)))
         if(point.tot >= totRangeBegin && point.tot <= totRangeEnd)
-        {
             return true;
-        }
 
     return false;
 }
 
-QList<ePoint> Frames::getListTotInRange(uint frameNumber, quint16 clusterNumber) const
+QList<ePoint> Frames::getListTotInRange(quint16 frameNumber, quint16 clusterNumber,
+                                        quint16 totRangeBegin, quint16 totRangeEnd) const
 {
     OneFrame frame = list.at(int(frameNumber));
     QList<ePoint> listePoint;
     listePoint.clear();
 
     foreach (ePoint point, frame.getList().at(int(clusterNumber)))
-        if(point.tot >= totRangeBegin && point.tot <= totRangeEnd){
+        if(point.tot >= totRangeBegin && point.tot <= totRangeEnd)
             listePoint << point;
-//            qDebug() << point.x << point.y << point.tot;
-        }
 
     return listePoint;
 }
 
-quint16 Frames::getClusterRangeBegin() const
-{
-    return clusterRangeBegin;
-}
-
-void Frames::setClusterRangeBegin(const quint16 &value)
-{
-    clusterRangeBegin = value;
-}
-
-quint16 Frames::getClusterRangeEnd() const
-{
-    return clusterRangeEnd;
-}
-
-void Frames::setClusterRangeEnd(const quint16 &value)
-{
-    clusterRangeEnd = value;
-}
-
-quint16 Frames::getMaxTot() const
-{
-    return maxTot;
-}
-
-quint16 Frames::getMaxCluster() const
-{
-    return maxCluster;
-}
-
-quint16 Frames::getTotRangeBegin() const
-{
-    return totRangeBegin;
-}
-
-void Frames::setTotRangeBegin(const quint16 &value)
-{
-    totRangeBegin = value;
-}
-
-quint16 Frames::getTotRangeEnd() const
-{
-    return totRangeEnd;
-}
-
-void Frames::setTotRangeEnd(const quint16 &value)
-{
-    totRangeEnd = value;
-}
-
-quint16 Frames::getMinTot() const
-{
-    return minTot;
-}
-
-quint16 Frames::getMinCluster() const
-{
-    return minCluster;
-}
-
-bool Frames::getAllTotInCluster() const
-{
-    return allTotInCluster;
-}
-
-bool Frames::isAllTotInCluster() const
-{
-    return getAllTotInCluster();
-}
-
-void Frames::setAllTotInCluster(bool value)
-{
-    allTotInCluster = value;
-}
-
-void Frames::slotSetMediPix(bool checked)
-{
-    setMediPix(checked);
-}
-
-//void Frames::slotSetAllTotInCluster(bool checked)
+//quint16 Frames::getClusterRangeBegin() const
 //{
-//    setAllTotInCluster(checked);
+//    return clusterRangeBegin;
+//}
+
+//void Frames::setClusterRangeBegin(const quint16 &value)
+//{
+//    clusterRangeBegin = value;
+//}
+
+//quint16 Frames::getClusterRangeEnd() const
+//{
+//    return clusterRangeEnd;
+//}
+
+//void Frames::setClusterRangeEnd(const quint16 &value)
+//{
+//    clusterRangeEnd = value;
+//}
+
+//quint16 Frames::getTotRangeBegin() const
+//{
+//    return totRangeBegin;
+//}
+
+//void Frames::setTotRangeBegin(const quint16 &value)
+//{
+//    totRangeBegin = value;
+//}
+
+//quint16 Frames::getTotRangeEnd() const
+//{
+//    return totRangeEnd;
+//}
+
+//void Frames::setTotRangeEnd(const quint16 &value)
+//{
+//    totRangeEnd = value;
+//}
+
+QVector<quint16> Frames::getClustersLenghtList()
+{
+    QVector<quint16> lenghtList;
+    for (quint16 frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
+        for (quint16 clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
+        {
+            quint16 lenght = getClusterLenght(frameNumber, clusterNumber);
+            if(!lenghtList.contains(lenght))
+                lenghtList << lenght;
+        }
+
+    std::sort(lenghtList.begin(), lenghtList.end());
+
+    return lenghtList;
+}
+
+QVector<quint16> Frames::getTotLenghtList()
+{
+    QVector<quint16> lenghtList;
+    for (quint16 frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
+        for (quint16 clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
+            for (quint16 eventNumber = 0; eventNumber < getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber) {
+                quint16 tot = getEPoint(frameNumber, clusterNumber, eventNumber).tot;
+                if(!lenghtList.contains(tot))
+                    lenghtList << tot;
+            }
+
+    std::sort(lenghtList.begin(), lenghtList.end());
+
+    return lenghtList;
+}
+
+//bool Frames::getAllTotInCluster() const
+//{
+//    return allTotInCluster;
+//}
+
+//bool Frames::isAllTotInCluster() const
+//{
+//    return getAllTotInCluster();
+//}
+
+//void Frames::setAllTotInCluster(bool value)
+//{
+//    allTotInCluster = value;
+//}
+
+//void Frames::slotSetMediPix(bool checked)
+//{
+//    setMediPix(checked);
 //}

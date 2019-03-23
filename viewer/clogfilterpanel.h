@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QEvent>
 
+#include "frames/frames.h"
+
 namespace Ui {
 class ClogFilterPanel;
 }
@@ -16,11 +18,11 @@ public:
     explicit ClogFilterPanel(QWidget *parent = nullptr);
     ~ClogFilterPanel();
 
-    void    setClusterRange(int max, int min);
-    void    setTotRange(int max, int min);
+    void    setClusterRange(QVector<quint16> vector);
+    void    setTotRange(QVector<quint16> vector);
 
-    void    setClusterBegin(int value);
-    void    setClusterEnd(int value);
+//    void    setClusterBegin(QString value);
+//    void    setClusterEnd(QString value);
 
     quint16 getClusterBegin() const;
     quint16 getClusterEnd() const;
@@ -28,41 +30,50 @@ public:
     quint16 getTotBegin() const;
     quint16 getTotEnd() const;
 
-    void    setTotBegin(int value);
-    void    setTotEnd(int value);
-
-    void    setLabelClusterMaxMin(quint16 max, quint16 min);
-    void    setLabelTotMaxMin(quint16 max, quint16 min);
+//    void    setLabelClusterMaxMin(quint16 max, quint16 min);
+//    void    setLabelTotMaxMin(quint16 max, quint16 min);
 
     bool    isClusterEnable();
     bool    isTotEnable();
     bool    isAllTotInCluster();
 
-//    void    setCluster
+    bool    isMediPix();
 
 private:
     Ui::ClogFilterPanel *ui;
 
-private slots:
-    void    slotEnableRange();
-    void    slotCheckIntersection   (int value);
+    QStringList clusterListModel, clusterListBegin, clusterListEnd;
+    QString clusterBeginLast, clusterEndLast;
 
-    void    slotPixGroupFilter(bool checked);
+    QStringList totListModel, totListBegin, totListEnd;
+    QString totBeginLast, totEndLast;
+
+    void    disconnectSignals       ();
+    void    connectSignals          ();
+
+//    void    clusterEndSetList       ();
+//    Frames* frames = nullptr;
+
+private slots:
+    void    slotEnableRange         ();
+
+//    void    slotPixGroupFilter      (bool checked);
+    void    slotDates               (QString value);
+
+public slots:
+    void    slotApplyFilter         ();
 
 signals:
-    void    signalRangeChanged      (QObject* obj, quint16 value);
+//    void    signalRangeChanged      (QObject* obj, quint16 value);
     void    signalApplyFilter       ();
-    void    signalRangeEnabled      (QObject*);
-    void    signalRangeDisabled     (QObject*);
 
     void    signalPixGroupMidiPixSet(bool);
-    void    signalAllTotInClusterToggled(bool);
+//    void    signalAllTotInClusterToggled(bool);
 
 protected:
 
     virtual void keyReleaseEvent(QKeyEvent *event);
-
-
+    bool event(QEvent *event);
 };
 
 #endif // CLOGFILTERPANEL_H
