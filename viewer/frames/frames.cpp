@@ -1,4 +1,5 @@
 #include "frames.h"
+#include "../viewer_widget.h"
 
 #include <QFile>
 #include <QApplication>
@@ -265,6 +266,35 @@ QVector<quint16> Frames::getClustersLenghtList()
     std::sort(lenghtList.begin(), lenghtList.end());
 
     return lenghtList;
+}
+
+QVector<QPointF> Frames::getClusterVectorTot(quint16 cluserLenght)
+{
+    QVector<QPointF> vector;
+    //key = tot, value = count
+    QMap<quint16, quint16> map;
+
+    for (quint16 frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
+        for (quint16 clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
+            if(getClusterLenght(frameNumber, clusterNumber) == cluserLenght)
+                for (quint16 eventNumber = 0; eventNumber < getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber)
+                {
+                    quint16 key = getEPoint(frameNumber, clusterNumber, eventNumber).tot;
+                    if(map.value(key) == 0)
+                        map.insert(key, 1);
+                    else
+                        map[key] = map.value(key) + 1;
+
+                }
+    QMapIterator<quint16, quint16> i(map);
+
+    while (i.hasNext())
+    {
+        i.next();
+        vector.append(QPointF(i.key(), i.value()));
+    }
+
+    return vector;
 }
 
 QVector<quint16> Frames::getTotLenghtList()

@@ -16,15 +16,27 @@ public:
     explicit GraphDialog(Frames* frames, QWidget *parent = nullptr);
     ~GraphDialog();
 
+    quint16 getCurrentClusterLenght();
+    QString getCurrentX();
+    QString getCurrentY();
+    QString getCurrentWindowGraph();
+
+    //очистить windowGraph
+    void    clearWindow();
+
+    //добавить к windowGraph строку
+    void appendWindow(QString value);
+
+    QString NEW_WINDOW = "New Window";
+
 private:
     Ui::GraphDialog *ui;
 
-//    QStringList listModel, listX, listY;
-
 private slots:
-    void slotCoefficientDisable(bool value);
+    void slotSelectDataX(QString value);
 
-//    void slotDates(QString value);
+signals:
+    void signalDataXChanged(QString);
 };
 
 #endif // GRAPHDIALOG_H

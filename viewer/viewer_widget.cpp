@@ -15,7 +15,6 @@
 
 #include <QDebug>
 
-#define CLOG_SIZE 256
 
 Viewer_widget::Viewer_widget(QWidget *parent) :
     QWidget(parent),

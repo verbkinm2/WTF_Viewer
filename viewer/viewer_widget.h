@@ -11,6 +11,9 @@
 #include "../eventfilter/fingerslide.h"
 #include "frames/frames.h"
 
+
+
+
 namespace Ui {
 class Viewer_widget;
 }
@@ -20,6 +23,9 @@ class Viewer_widget : public QWidget
     Q_OBJECT
 
 public:
+
+    const static int CLOG_SIZE = 256;
+
     explicit Viewer_widget(QWidget *parent = nullptr);
     ~Viewer_widget();
 

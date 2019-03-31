@@ -61,6 +61,7 @@ public:
 //    void setTotRangeEnd(const quint16 &value);
 
     QVector<quint16> getClustersLenghtList();
+    QVector<QPointF> getClusterVectorTot(quint16 clusterLenght);
     QVector<quint16> getTotLenghtList();
 
 //    bool getAllTotInCluster() const;

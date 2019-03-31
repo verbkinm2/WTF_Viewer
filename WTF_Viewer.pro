@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -36,7 +36,12 @@ SOURCES += \
     viewer/viewer_widget.cpp \
     progressbar.cpp \
     viewer/clogfilterpanel.cpp \
-    graph/graphdialog.cpp
+    graph/graphdialog.cpp \
+    graph/centralwidget.cpp \
+    graph/chart.cpp \
+    graph/chartview.cpp \
+    graph/customtablemodel.cpp \
+    graph/panelwidget.cpp
 
 HEADERS += \
     eventfilter/eventfilter.h \
@@ -49,7 +54,12 @@ HEADERS += \
     mainwindow.h \
     progressbar.h \
     viewer/clogfilterpanel.h \
-    graph/graphdialog.h
+    graph/graphdialog.h \
+    graph/centralwidget.h \
+    graph/chart.h \
+    graph/chartview.h \
+    graph/customtablemodel.h \
+    graph/panelwidget.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -61,7 +71,8 @@ FORMS += \
     export/export.ui \
     progressbar.ui \
     viewer/clogfilterpanel.ui \
-    graph/graphdialog.ui
+    graph/graphdialog.ui \
+    graph/panelwidget.ui
 
 RESOURCES += \
     img.qrc

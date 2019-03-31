@@ -6,7 +6,7 @@
 #include <QHeaderView>
 #include <QDebug>
 
-const QString VERSION =  "0.8.2";
+const QString VERSION =  "0.8.91";
 
 #ifdef Q_OS_Linux
     #define SPLITTER_PATH "/"
@@ -132,10 +132,30 @@ void MainWindow::slotExportFile()
             else
                 error++;
         }
-        QApplication::restoreOverrideCursor();QApplication::restoreOverrideCursor();
+        QApplication::restoreOverrideCursor();
 
         QMessageBox::information(this, "Export", "Export " + QString::number(correct) + " file(s)<br>"
                                                                                         "Error export " + QString::number(error) + " file(s)");
+    }
+}
+
+void MainWindow::slotCloseGraphWindow(QObject *obj)
+{
+    delete obj;
+    graphWindowList.removeOne(static_cast<CentralWidget*>(obj));
+}
+
+void MainWindow::slotGrapgWindowCheck(QString value)
+{
+    GraphDialog* gd = static_cast<GraphDialog*>(sender());
+
+    gd->clearWindow();
+
+    foreach (CentralWidget* cw, graphWindowList)
+    {
+        if(cw->getDataXType() != value)
+            continue;
+        gd->appendWindow(cw->getTitle());
     }
 }
 void MainWindow::slotAuthor()
@@ -152,13 +172,51 @@ void MainWindow::slotAuthor()
 
 void MainWindow::slotPlotGraph()
 {
-    GraphDialog* gb = new GraphDialog(pViewerWidget->getFrames(), this);
-    if(gb->exec() == QDialog::Accepted)
+    Frames* frames = pViewerWidget->getFrames();
+    GraphDialog* gd = new GraphDialog(frames, this);
+
+    connect(gd,          SIGNAL(signalDataXChanged(QString)), this,
+                         SLOT(slotGrapgWindowCheck(QString)));
+
+    //наполняем список GraphDialog существующими графиками
+    foreach (CentralWidget* cw, graphWindowList)
+        gd->appendWindow(cw->getTitle());
+
+    emit gd->signalDataXChanged(gd->getCurrentX());
+
+    if(gd->exec() == QDialog::Accepted)
     {
-        gb->show();
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+
+        QVector<QPointF> vector = frames->getClusterVectorTot(gd->getCurrentClusterLenght());
+        if(graphWindowList.length() == 0 || gd->getCurrentWindowGraph() == gd->NEW_WINDOW)
+        {
+            CentralWidget* graphWindow = new CentralWidget(this);
+            graphWindow->addSeries(vector, gd->getCurrentY() + "px", gd->getCurrentX(), "Count");
+            graphWindowList.append(graphWindow);
+
+            connect(graphWindow, SIGNAL(signalCloseWindow(QObject*)), this,
+                                 SLOT(slotCloseGraphWindow(QObject*)));
+
+            graphWindow->show();
+        }
+        else
+        {
+            CentralWidget* graphWindow = nullptr;
+
+            foreach (CentralWidget* cw, graphWindowList)
+                if(cw->getTitle() == gd->getCurrentWindowGraph())
+                    graphWindow = cw;
+
+            graphWindow->addSeries(vector, gd->getCurrentY() + "px", gd->getCurrentX(), "Count");
+            graphWindow->show();
+        }
+
+        QApplication::restoreOverrideCursor();
+
     }
 
-    delete gb;
+    delete gd;
 }
 void MainWindow::slotSelectFile(const QModelIndex& index)
 {
@@ -192,4 +250,7 @@ MainWindow::~MainWindow()
 
     delete pMenuFile;
     delete pMenuAbout;
+
+    foreach (CentralWidget* cw, graphWindowList)
+        delete cw;
 }

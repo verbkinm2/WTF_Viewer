@@ -1,0 +1,306 @@
+#include "panelwidget.h"
+#include "ui_panelwidget.h"
+
+#include <QChart>
+#include <QXYSeries>
+#include <QColorDialog>
+#include <QValueAxis>
+#include <QMessageBox>
+#include <QFileDialog>
+
+#include <QDebug>
+
+
+PanelWidget::PanelWidget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::PanelWidget)
+{
+    ui->setupUi(this);
+
+    // add items to theme combobox
+    ui->themeComboBox->addItem("Light", QChart::ChartThemeLight);
+    ui->themeComboBox->addItem("Blue Cerulean", QChart::ChartThemeBlueCerulean);
+    ui->themeComboBox->addItem("Dark", QChart::ChartThemeDark);
+    ui->themeComboBox->addItem("Brown Sand", QChart::ChartThemeBrownSand);
+    ui->themeComboBox->addItem("Blue NCS", QChart::ChartThemeBlueNcs);
+    ui->themeComboBox->addItem("High Contrast", QChart::ChartThemeHighContrast);
+    ui->themeComboBox->addItem("Blue Icy", QChart::ChartThemeBlueIcy);
+    ui->themeComboBox->addItem("Qt", QChart::ChartThemeQt);
+
+    ui->tickCountX->setValue(5);
+    ui->tickCountY->setValue(5);
+
+    connect(ui->themeComboBox,  SIGNAL(currentIndexChanged(int)), this,
+                                SIGNAL(signalChangeTheme(int)));
+
+    connect(ui->pointVisible,   SIGNAL(toggled(bool)), this,
+                                SLOT(slotSetPointVisible(bool)));
+
+    connect(ui->legendPosition, SIGNAL(currentIndexChanged(int)), this,
+                                SIGNAL(signalSetLegendPosition(int)));
+
+    connect(ui->title,          SIGNAL(textChanged(QString)), this,
+                                SIGNAL(signalSetTitile(QString)));
+
+    connect(ui->animation,      SIGNAL(toggled(bool)), this,
+                                SIGNAL(signalAnimation(bool)));
+
+    connect(ui->antialiasing,   SIGNAL(toggled(bool)), this,
+                                SIGNAL(signalAntialiasing(bool)));
+
+    connect(ui->seriesList,     SIGNAL(currentIndexChanged(int)), this,
+                                SLOT(slotSetSeriesPropery(int)));
+
+    connect(ui->colorSelect,    SIGNAL(clicked()), this,
+                                SLOT(slotSetSeriesColor()));
+
+    connect(ui->seriesType,     SIGNAL(currentIndexChanged(int)), this,
+                                SLOT(slotSetSeriesType(int)));
+
+    connect(ui->hide,           SIGNAL(toggled(bool)), this,
+                                SLOT(slotHideSeries(bool)));
+
+    connect(ui->tickCountX,     SIGNAL(valueChanged(int)), this,
+                                SIGNAL(signalTickCountChangeX(int)));
+    connect(ui->tickCountY,     SIGNAL(valueChanged(int)), this,
+                                SIGNAL(signalTickCountChangeY(int)));
+
+    connect(ui->penWidth,       SIGNAL(valueChanged(int)), this,
+                                SLOT(slotSetSeriesPenWidth(int)));
+
+    connect(ui->deleteSeries,   SIGNAL(clicked()), this,
+                                SLOT(slotDeleteSeries()));
+
+    connect(ui->saveToCSV,      SIGNAL(clicked()), this,
+                                SLOT(slotSaveToCSV()));
+}
+
+
+
+PanelWidget::~PanelWidget()
+{
+    delete ui;
+
+    foreach (QXYSeries* series, seriesList)
+        delete series;
+}
+
+void PanelWidget::addSeriesList(QXYSeries *series)
+{
+    seriesList.append(series);
+    CustomTableModel* model = new CustomTableModel();
+    model->setVector(series->pointsVector());
+    modelList.append(model);
+
+    ui->seriesList->addItem(series->name());
+}
+
+void PanelWidget::createTableData()
+{
+    CustomTableModel* model = modelList.at(ui->seriesList->currentIndex());
+    ui->tableView->setModel(model);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    mapper.setXColumn(0);
+    mapper.setYColumn(1);
+    mapper.setSeries(currentSeries);
+    mapper.setModel(model);
+
+    QString seriesColorHex = "#000000";
+
+    seriesColorHex = "#" + QString::number(currentSeries->pen().color().rgb(), 16).right(6).toUpper();
+    model->addMapping(seriesColorHex, QRect(0, 0, 2, model->rowCount()));
+}
+
+void PanelWidget::setDisableUnits(bool value)
+{
+    ui->tab_2->setDisabled(value);
+    ui->seriesType->setDisabled(value);
+}
+
+int PanelWidget::getSeriesType()
+{
+    int type = ui->seriesType->currentIndex();
+    switch (type) {
+    case 0:
+        type = QXYSeries::SeriesTypeLine;
+        break;
+    case 1:
+        type = QXYSeries::SeriesTypeSpline;
+        break;
+    case 2:
+        type = QXYSeries::SeriesTypeScatter;
+        break;
+    default:
+        type = QXYSeries::SeriesTypeLine;
+        break;
+    }
+
+    return type;
+}
+
+void PanelWidget::slotSetSeriesPropery(int value)
+{
+    if(value < 0)
+    {
+        currentSeries = nullptr;
+        setDisableUnits(true);
+
+        return;
+    }
+    else
+        setDisableUnits(false);
+
+    QXYSeries* series = seriesList.at(value);
+    QPixmap pix(16, 16);
+    pix.fill(series->color());
+    ui->colorSelect->setIcon(QIcon(pix));
+
+    currentSeries = series;
+
+    ui->pointVisible->setChecked(currentSeries->pointsVisible());
+    ui->hide->setChecked(!currentSeries->isVisible());
+
+    ui->penWidth->setValue(currentSeries->pen().width());
+
+    createTableData();
+}
+
+void PanelWidget::slotSetPointVisible(bool value)
+{
+    currentSeries->setPointsVisible(value);
+}
+
+void PanelWidget::slotSetSeriesColor()
+{
+    QColor color = QColorDialog::getColor(currentSeries->pen().color(), this);
+    if(color.spec())
+    {
+        currentSeries->setColor(color);
+
+        QPixmap pix(16, 16);
+        pix.fill(color);
+        ui->colorSelect->setIcon(QIcon(pix));
+
+        //обновление цвета в TableView
+        modelList.at(ui->seriesList->currentIndex())->updateColor(color);
+    }
+}
+
+void PanelWidget::slotSetSeriesType(int value)
+{
+    QXYSeries* series = nullptr;
+    QChart* chart = seriesList.at(0)->chart();
+
+    QString titleX = chart->axisX()->titleText();
+    QString titleY = chart->axisY()->titleText();
+
+    disconnect(ui->seriesList,  SIGNAL(currentIndexChanged(int)), this,
+                                SLOT(slotSetSeriesPropery(int)));
+
+    ui->seriesList->clear();
+
+    connect(ui->seriesList,     SIGNAL(currentIndexChanged(int)), this,
+                                SLOT(slotSetSeriesPropery(int)));
+
+    for (int i = 0; i < seriesList.length(); ++i) {
+        switch (value) {
+        case 0:
+            series = new QLineSeries;
+            break;
+        case 1:
+            series = new QSplineSeries;
+            break;
+        case 2:
+            series = new QScatterSeries;
+            break;
+        default:
+            break;
+        }
+
+        QXYSeries* seriestmp = seriesList.at(i);
+        seriesList.replace(i, series);
+
+        *series << seriestmp->points();
+        series->setColor(seriestmp->color());
+        series->setName(seriestmp->name());
+        series->setPen(seriestmp->pen());
+        series->setPointsVisible(seriestmp->pointsVisible());
+        series->setVisible(seriestmp->isVisible());
+
+        chart->removeSeries(seriestmp);
+        delete seriestmp;
+        chart->addSeries(series);
+
+        ui->seriesList->addItem(series->name());
+    }
+
+    chart->createDefaultAxes();
+
+    chart->axisX()->setTitleText(titleX);
+    chart->axisY()->setTitleText(titleY);
+
+    (static_cast<QValueAxis*>(chart->axisX()))->setTickCount(ui->tickCountX->value());
+    (static_cast<QValueAxis*>(chart->axisY()))->setTickCount(ui->tickCountY->value());
+}
+
+void PanelWidget::slotHideSeries(bool value)
+{
+    if(value)
+        currentSeries->hide();
+    else
+        currentSeries->setVisible(true);
+}
+
+void PanelWidget::slotSetSeriesPenWidth(int value)
+{
+    QPen pen = currentSeries->pen();
+    pen.setWidth(value);
+    currentSeries->setPen(pen);
+}
+
+void PanelWidget::slotDeleteSeries()
+{
+    QMessageBox msgBox(this);
+    msgBox.setText("Are you really delete series?");
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.setIcon(QMessageBox::Question);
+
+    if(msgBox.exec() == QMessageBox::Ok)
+    {
+        QChart* chart = currentSeries->chart();
+        chart->removeSeries(currentSeries);
+
+        delete currentSeries;
+
+        int index = ui->seriesList->currentIndex();
+
+        delete modelList.at(index);
+
+
+        seriesList.removeAt(index);
+        modelList.removeAt(index);
+
+        ui->seriesList->removeItem(index);
+    }
+}
+
+void PanelWidget::slotSaveToCSV()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    ("Save as CSV"),
+                                                    QDir::rootPath() + currentSeries->name(),
+                                                    "CSV (*.csv);;All files (*.*)");
+    if(fileName != "")
+    {
+        QFile file(fileName);
+        QTextStream writeStrime(&file);
+
+        if(file.open(QFile::WriteOnly))
+            foreach (QPointF point, currentSeries->points())
+                writeStrime <<   point.x() << ";" << point.y() << "\n";
+
+        file.close();
+    }
+}
