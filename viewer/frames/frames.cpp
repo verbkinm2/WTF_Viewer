@@ -297,6 +297,33 @@ QVector<QPointF> Frames::getClusterVectorTot(quint16 cluserLenght)
     return vector;
 }
 
+QVector<QPointF> Frames::getClusterVector()
+{
+    QVector<QPointF> vector;
+    //key = cluster, value = count
+    QMap<quint16, quint16> map;
+
+    for (quint16 frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
+        for (quint16 clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
+        {
+            quint16 key = getClusterLenght(frameNumber, clusterNumber);
+            if(map.value(key) == 0)
+                map.insert(key, 1);
+            else
+                map[key] = map.value(key) + 1;
+        }
+
+    QMapIterator<quint16, quint16> i(map);
+
+    while (i.hasNext())
+    {
+        i.next();
+        vector.append(QPointF(i.key(), i.value()));
+    }
+
+    return vector;
+}
+
 QVector<quint16> Frames::getTotLenghtList()
 {
     QVector<quint16> lenghtList;

@@ -9,12 +9,12 @@ GraphDialog::GraphDialog(Frames *frames, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+//    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     foreach(quint16 value, frames->getClustersLenghtList())
         ui->DataY->addItem(QString::number(value));
 
-    QApplication::restoreOverrideCursor();
+//    QApplication::restoreOverrideCursor();
 
     connect(ui->DataX, SIGNAL(currentTextChanged(QString)), this, SLOT(slotSelectDataX(QString)));
 

@@ -174,6 +174,7 @@ void MainWindow::slotPlotGraph()
 {
     Frames* frames = pViewerWidget->getFrames();
     GraphDialog* gd = new GraphDialog(frames, this);
+    QString legendText;
 
     connect(gd,          SIGNAL(signalDataXChanged(QString)), this,
                          SLOT(slotGrapgWindowCheck(QString)));
@@ -186,19 +187,35 @@ void MainWindow::slotPlotGraph()
 
     if(gd->exec() == QDialog::Accepted)
     {
-        QApplication::setOverrideCursor(Qt::WaitCursor);
+//        QApplication::setOverrideCursor(Qt::WaitCursor);
 
-        QVector<QPointF> vector = frames->getClusterVectorTot(gd->getCurrentClusterLenght());
+        QVector<QPointF> vector;
+        if(gd->getCurrentX() == "Tots")
+        {
+            vector = frames->getClusterVectorTot(gd->getCurrentClusterLenght());
+            legendText = gd->getCurrentY() + "px";
+        }
+        if(gd->getCurrentX() == "Clusters")
+        {
+            vector = frames->getClusterVector();
+            legendText = currentActiveFile;
+        }
+        if(gd->getCurrentX() == "Energy")
+        {
+            QMessageBox::information(this, "oooooops", "Kiss my ass, my little unicorn! =))");
+            return;
+        }
+
         if(graphWindowList.length() == 0 || gd->getCurrentWindowGraph() == gd->NEW_WINDOW)
         {
             CentralWidget* graphWindow = new CentralWidget(this);
-            graphWindow->addSeries(vector, gd->getCurrentY() + "px", gd->getCurrentX(), "Count");
+            graphWindow->addSeries(vector, legendText, gd->getCurrentX(), "Count");
             graphWindowList.append(graphWindow);
 
             connect(graphWindow, SIGNAL(signalCloseWindow(QObject*)), this,
                                  SLOT(slotCloseGraphWindow(QObject*)));
 
-            graphWindow->show();
+            graphWindow->showMaximized();
         }
         else
         {
@@ -208,7 +225,7 @@ void MainWindow::slotPlotGraph()
                 if(cw->getTitle() == gd->getCurrentWindowGraph())
                     graphWindow = cw;
 
-            graphWindow->addSeries(vector, gd->getCurrentY() + "px", gd->getCurrentX(), "Count");
+            graphWindow->addSeries(vector, legendText, gd->getCurrentX(), "Count");
             graphWindow->show();
         }
 
@@ -220,7 +237,9 @@ void MainWindow::slotPlotGraph()
 }
 void MainWindow::slotSelectFile(const QModelIndex& index)
 {
+
     QFileInfo file(pFSModel->filePath(index));
+    currentActiveFile = file.fileName();
 
     this->statusBar()->showMessage(pFSModel->filePath(index));
     pViewerWidget->setImageFile(pFSModel->filePath(index));

@@ -12,6 +12,7 @@ QT_CHARTS_USE_NAMESPACE
 class ChartView : public QChartView
 //![1]
 {
+    Q_OBJECT
 public:
     ChartView(QWidget *parent = nullptr);
 
@@ -28,6 +29,8 @@ public:
 
     struct rangeAxis rangeX, rangeY;
 
+public slots:
+    void slotResetZoomAndPosition();
 //![2]
 protected:
     bool vieportEvent(QEvent *event);
@@ -43,6 +46,9 @@ protected:
 private:
     //точка с координатами Charts, где была нажата правая кнопка
     QPointF lastMousePos;
+
+signals:
+    void signalMousePosition(QPointF);
 };
 
 #endif

@@ -75,8 +75,6 @@ PanelWidget::PanelWidget(QWidget *parent) :
                                 SLOT(slotSaveToCSV()));
 }
 
-
-
 PanelWidget::~PanelWidget()
 {
     delete ui;
@@ -140,6 +138,11 @@ int PanelWidget::getSeriesType()
     return type;
 }
 
+void PanelWidget::setTitle(QString title)
+{
+    ui->title->setText(title);
+}
+
 void PanelWidget::slotSetSeriesPropery(int value)
 {
     if(value < 0)
@@ -162,7 +165,13 @@ void PanelWidget::slotSetSeriesPropery(int value)
     ui->pointVisible->setChecked(currentSeries->pointsVisible());
     ui->hide->setChecked(!currentSeries->isVisible());
 
-    ui->penWidth->setValue(currentSeries->pen().width());
+    if(currentSeries->type() == QAbstractSeries::SeriesTypeScatter)
+    {
+        QScatterSeries* scatSer = static_cast<QScatterSeries*>(currentSeries);
+        ui->penWidth->setValue(int(scatSer->markerSize()));
+    }
+    else
+        ui->penWidth->setValue(currentSeries->pen().width());
 
     createTableData();
 }
@@ -178,6 +187,11 @@ void PanelWidget::slotSetSeriesColor()
     if(color.spec())
     {
         currentSeries->setColor(color);
+        if(currentSeries->type() == QAbstractSeries::SeriesTypeScatter)
+        {
+            QScatterSeries* scatSer = static_cast<QScatterSeries*>(currentSeries);
+            scatSer->setBorderColor(color);
+        }
 
         QPixmap pix(16, 16);
         pix.fill(color);
@@ -191,6 +205,7 @@ void PanelWidget::slotSetSeriesColor()
 void PanelWidget::slotSetSeriesType(int value)
 {
     QXYSeries* series = nullptr;
+
     QChart* chart = seriesList.at(0)->chart();
 
     QString titleX = chart->axisX()->titleText();
@@ -204,7 +219,8 @@ void PanelWidget::slotSetSeriesType(int value)
     connect(ui->seriesList,     SIGNAL(currentIndexChanged(int)), this,
                                 SLOT(slotSetSeriesPropery(int)));
 
-    for (int i = 0; i < seriesList.length(); ++i) {
+    for (int i = 0; i < seriesList.length(); ++i)
+    {
         switch (value) {
         case 0:
             series = new QLineSeries;
@@ -225,7 +241,16 @@ void PanelWidget::slotSetSeriesType(int value)
         *series << seriestmp->points();
         series->setColor(seriestmp->color());
         series->setName(seriestmp->name());
-        series->setPen(seriestmp->pen());
+        if(series->type() == QAbstractSeries::SeriesTypeScatter)
+        {
+            QScatterSeries* scatSer = static_cast<QScatterSeries*>(series);
+            scatSer->setMarkerSize(seriestmp->pen().width());
+            scatSer->setBorderColor(seriestmp->pen().color());
+            scatSer->setPen(seriestmp->pen());
+        }
+        else
+            series->setPen(seriestmp->pen());
+
         series->setPointsVisible(seriestmp->pointsVisible());
         series->setVisible(seriestmp->isVisible());
 
@@ -255,15 +280,26 @@ void PanelWidget::slotHideSeries(bool value)
 
 void PanelWidget::slotSetSeriesPenWidth(int value)
 {
-    QPen pen = currentSeries->pen();
-    pen.setWidth(value);
-    currentSeries->setPen(pen);
+    if(currentSeries->type() == QAbstractSeries::SeriesTypeScatter)
+    {
+        QScatterSeries* scatSer = static_cast<QScatterSeries*>(currentSeries);
+        scatSer->setMarkerSize(value);
+        QPen pen = currentSeries->pen();
+        pen.setWidth(value);
+        scatSer->setPen(pen);
+    }
+    else
+    {
+        QPen pen = currentSeries->pen();
+        pen.setWidth(value);
+        currentSeries->setPen(pen);
+    }
 }
 
 void PanelWidget::slotDeleteSeries()
 {
     QMessageBox msgBox(this);
-    msgBox.setText("Are you really delete series?");
+    msgBox.setText("Are you really delete this series?");
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setIcon(QMessageBox::Question);
 
@@ -284,6 +320,7 @@ void PanelWidget::slotDeleteSeries()
 
         ui->seriesList->removeItem(index);
     }
+    emit signalSeriesDeleted();
 }
 
 void PanelWidget::slotSaveToCSV()

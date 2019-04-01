@@ -33,6 +33,8 @@ public:
     void    addSeriesList(QXYSeries* series);
     int     getSeriesType();
 
+    void    setTitle(QString title);
+
 private:
     Ui::PanelWidget *ui;
 
@@ -61,6 +63,8 @@ signals:
 
     void    signalTickCountChangeX(int);
     void    signalTickCountChangeY(int);
+
+    void    signalSeriesDeleted();
 
 private slots:
     void    slotSetSeriesPropery(int value);

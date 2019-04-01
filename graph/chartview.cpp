@@ -9,7 +9,13 @@ ChartView::ChartView(QWidget *parent) :
 //    this->setMouseTracking(true);
     setRubberBand(QChartView::RectangleRubberBand);
 //    setDragMode(QGraphicsView::ScrollHandDrag);
+}
 
+void ChartView::slotResetZoomAndPosition()
+{
+    chart()->zoomReset();
+    chart()->axisX()->setRange(rangeX.min, rangeX.max);
+    chart()->axisY()->setRange(rangeY.min, rangeY.max);
 }
 void ChartView::mousePressEvent(QMouseEvent *event)
 {
@@ -32,6 +38,7 @@ void ChartView::mouseMoveEvent(QMouseEvent *event)
         lastMousePos = event->pos();
         event->accept();
     }
+    emit signalMousePosition(chart()->mapToValue(event->pos()));
 
     QChartView::mouseMoveEvent(event);
 }
@@ -74,9 +81,7 @@ void ChartView::keyPressEvent(QKeyEvent *event)
 
         break;
     case Qt::Key_Escape:
-            chart()->zoomReset();
-            chart()->axisX()->setRange(rangeX.min, rangeX.max);
-            chart()->axisY()->setRange(rangeY.min, rangeY.max);
+        slotResetZoomAndPosition();
         break;
     default:
         QGraphicsView::keyPressEvent(event);

@@ -4,6 +4,8 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QDebug>
+#include <QStatusBar>
+#include <limits>
 
 #include <QApplication>
 
@@ -11,9 +13,14 @@ CentralWidget::CentralWidget(QWidget *parent) : QMainWindow(parent)
 {
     createMenu();
 
+    statusBar()->insertWidget(0, &statusBarWidget);
+
     XYDefault();
 
-    chart.setTitle("Title");
+    static uint titleNumber = 0;
+    chart.setTitle("Graph " + QString::number(++titleNumber));
+    panelWidget.setTitle(chart.title());
+
     QFont font = chart.titleFont();
     font.setPixelSize(18);
     chart.setTitleFont(QFont(font));
@@ -30,31 +37,35 @@ CentralWidget::CentralWidget(QWidget *parent) : QMainWindow(parent)
     layout.addWidget(&panelWidget);
 
     layout.setStretch(0, 1);
-//    centralWidget = new QWidget();
     centralWidget.setLayout(&layout);
     setCentralWidget(&centralWidget);
     chartView.setFocus();
 
     connect(&panelWidget,    SIGNAL(signalChangeTheme(int)), this,
-                            SLOT(slotSetTheme(int)));
+                             SLOT(slotSetTheme(int)));
 
     connect(&panelWidget,    SIGNAL(signalSetLegendPosition(int)), this,
-                            SLOT(slotSetLegentPosition(int)));
+                             SLOT(slotSetLegentPosition(int)));
 
     connect(&panelWidget,    SIGNAL(signalSetTitile(QString)), this,
-                            SLOT(slotSetTitle(QString)));
+                             SLOT(slotSetTitle(QString)));
 
     connect(&panelWidget,    SIGNAL(signalAnimation(bool)), this,
-                            SLOT(slotAnimation(bool)));
+                             SLOT(slotAnimation(bool)));
 
     connect(&panelWidget,    SIGNAL(signalAntialiasing(bool)), this,
-                            SLOT(slotAntialiasing(bool)));
+                             SLOT(slotAntialiasing(bool)));
 
     connect(&panelWidget,    SIGNAL(signalTickCountChangeX(int)), this,
-                            SLOT(slotSetTcickCountX(int)));
+                             SLOT(slotSetTcickCountX(int)));
     connect(&panelWidget,    SIGNAL(signalTickCountChangeY(int)), this,
-            SLOT(slotSetTcickCountY(int)));
+                             SLOT(slotSetTcickCountY(int)));
 
+    connect(&panelWidget,    SIGNAL(signalSeriesDeleted()), this,
+                             SLOT(slotReRange()));
+
+    connect(&chartView,      SIGNAL(signalMousePosition(QPointF)), this,
+                             SLOT(slotViewXYCoordinate(QPointF)));
 //    this->setWindowFlag(Qt::Widget);
 }
 
@@ -95,6 +106,21 @@ void CentralWidget::addSeries(QVector<QPointF> pointVector, QXYSeries::SeriesTyp
     series->setName(legendTitle);
     chart.addSeries(series);
     panelWidget.addSeriesList(series);
+
+    if(chart.series().length() > 2) //1 - axis x, 2 - axis y
+    {
+        QXYSeries* ser = static_cast<QXYSeries*>(chart.series().last());
+        QColor newColor = series->color();
+        QPen pen = ser->pen();
+        pen.setColor(newColor);
+        series->setPen(pen);
+        if(series->type() == QAbstractSeries::SeriesTypeScatter)
+        {
+            QScatterSeries* scatSer = static_cast<QScatterSeries*>(series);
+            scatSer->setMarkerSize(pen.width());
+            scatSer->setBorderColor(newColor);
+        }
+    }
 
 //Что-бы правильно работало нажатие Esc >>
     chartView.rangeX.min = minX;
@@ -141,25 +167,54 @@ void CentralWidget::XYDefault()
 
 void CentralWidget::createMenu()
 {
-//    pMenuFile = new QMenu("File");
     menuFile.setTitle("File");
     menuFile.addAction(QIcon(":/save_as"), "save as BMP", this, SLOT(slotSaveBMP()));
 
-    menuFile.addSeparator();
-
-//    menuFile.addAction(QIcon(":/exit"), "Exit", QApplication::instance(), SLOT(close()));
-
-//    pMenuAbout= new QMenu("About");
-//    pMenuAbout->addAction(QIcon(":/author"),"Author", this, SLOT(slotAuthor()));
-//    pMenuAbout->addAction(QIcon(":/qt_logo"), "About Qt", QApplication::instance(), SLOT(aboutQt()));
-
-//    pMenuGraph = new QMenu("Graph");
-//    pMenuGraph->addAction(QIcon(":/graph"), "Plot the graph", this, SLOT(slotPlotGraph()));
-//    pMenuGraph->setDisabled(true);
+    menuView.setTitle("View");
+    menuView.addAction(QIcon(":/reset"), "Reset zoom and position", this, SLOT(slotResetZoomAndPosition()));
 
     this->menuBar()->addMenu(&menuFile);
-//    this->menuBar()->addMenu(pMenuGraph);
-//    this->menuBar()->addMenu(pMenuAbout);
+    this->menuBar()->addMenu(&menuView);
+}
+
+double CentralWidget::findMaxX(QXYSeries *series)
+{
+    double maxX = 0;
+
+    foreach (QPointF point, series->points())
+        if(point.x() > maxX) maxX = point.x();
+
+    return maxX;
+}
+
+double CentralWidget::findMinX(QXYSeries *series)
+{
+    double minX = std::numeric_limits<double>::max();
+
+    foreach (QPointF point, series->points())
+        if(point.x() < minX) minX = point.x();
+
+    return minX;
+}
+
+double CentralWidget::findMaxY(QXYSeries *series)
+{
+    double maxY = 0;
+
+    foreach (QPointF point, series->points())
+        if(point.y() > maxY) maxY = point.y();
+
+    return maxY;
+}
+
+double CentralWidget::findMinY(QXYSeries *series)
+{
+    double minY = std::numeric_limits<double>::max();
+
+    foreach (QPointF point, series->points())
+        if(point.y() < minY) minY = point.y();
+
+    return minY;
 }
 
 void CentralWidget::slotSetTheme(int theme)
@@ -228,6 +283,50 @@ void CentralWidget::slotSaveBMP()
         QPixmap pix = chartView.grab();
         pix.toImage().save(fileName, "BMP");
     }
+}
+
+void CentralWidget::slotReRange()
+{
+    maxX = 0;
+    minX = std::numeric_limits<double>::max();
+    maxY = 0;
+    minY = std::numeric_limits<double>::max();
+
+    for (int i = 2; i < chart.series().count(); ++i)
+    {
+        QXYSeries* series = static_cast<QXYSeries*>(chart.series().at(i));
+        if(maxX < findMaxX(series)) maxX = findMaxX(series);
+        if(minX > findMinX(series)) minX = findMinX(series);
+        if(maxY < findMaxY(series)) maxY = findMaxY(series);
+        if(minY > findMinY(series)) minY = findMinY(series);
+    }
+//Что-бы правильно работало нажатие Esc >>
+    chartView.rangeX.min = minX;
+    chartView.rangeX.max = maxX;
+
+    chartView.rangeY.min = minY;
+    chartView.rangeY.max = maxY;
+//Что-бы правильно работало нажатие Esc <<
+
+    QString axisX_Title = chart.axisX()->titleText();
+    QString axisY_Title = chart.axisY()->titleText();
+
+    chart.createDefaultAxes();
+    chart.axisX()->setRange(minX, maxX);
+    chart.axisX()->setTitleText(axisX_Title);
+    chart.axisY()->setRange(minY, maxY);
+    chart.axisY()->setTitleText(axisY_Title);
+}
+
+void CentralWidget::slotResetZoomAndPosition()
+{
+    chartView.slotResetZoomAndPosition();
+}
+
+void CentralWidget::slotViewXYCoordinate(QPointF point)
+{
+    statusBarWidget.setText("X: " + QString::number(point.x()) +
+                            "   Y: " + QString::number(point.y()));
 }
 
 void CentralWidget::closeEvent(QCloseEvent *event)

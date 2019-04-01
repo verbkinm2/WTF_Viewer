@@ -16,6 +16,7 @@
 #include <QValueAxis>
 #include <QMenu>
 #include <QMenuBar>
+#include <QLabel>
 
 #include <QHBoxLayout>
 
@@ -37,7 +38,9 @@ public:
     QString getDataXType();
 
 private:
-    QWidget        centralWidget;// = nullptr;
+    QWidget        centralWidget;
+    QLabel         statusBarWidget;
+
     ChartView      chartView;
     Chart          chart;
 
@@ -53,12 +56,17 @@ private:
     double minX = std::numeric_limits<int>::max();
     double minY = std::numeric_limits<int>::max();
 
-    QMenu         menuFile;//       = nullptr;
+    QMenu         menuFile, menuView;
 
     //ось X и Y на всем полотне
     void XYDefault();
 
     void createMenu();
+
+    double findMaxX(QXYSeries* series);
+    double findMinX(QXYSeries* series);
+    double findMaxY(QXYSeries* series);
+    double findMinY(QXYSeries* series);
 
 signals:
 
@@ -74,10 +82,13 @@ private slots:
 
     void    slotSaveBMP             ();
 
+    void    slotReRange             ();
 
+    void    slotResetZoomAndPosition();
+
+    void    slotViewXYCoordinate    (QPointF point);
 public slots:
 
-    // QWidget interface
 protected:
     virtual void closeEvent(QCloseEvent *event);
 

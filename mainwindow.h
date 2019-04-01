@@ -43,6 +43,8 @@ private:
 
     void createMenu();
 
+    QString             currentActiveFile;
+
 protected:
     virtual bool        event(QEvent *event);
 
