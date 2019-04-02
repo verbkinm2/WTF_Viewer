@@ -21,6 +21,8 @@ public:
     QString getCurrentY();
     QString getCurrentWindowGraph();
 
+    void    selectLastWindow();
+
     //очистить windowGraph
     void    clearWindow();
 

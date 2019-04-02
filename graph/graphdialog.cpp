@@ -46,6 +46,11 @@ QString GraphDialog::getCurrentWindowGraph()
     return  ui->windowGraph->currentText();
 }
 
+void GraphDialog::selectLastWindow()
+{
+    ui->windowGraph->setCurrentIndex(ui->windowGraph->count() - 1);
+}
+
 void GraphDialog::clearWindow()
 {
     ui->windowGraph->clear();

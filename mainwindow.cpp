@@ -6,7 +6,7 @@
 #include <QHeaderView>
 #include <QDebug>
 
-const QString VERSION =  "0.8.10";
+const QString VERSION =  "0.8.11";
 
 #ifdef Q_OS_Linux
     #define SPLITTER_PATH "/"
@@ -157,6 +157,8 @@ void MainWindow::slotGrapgWindowCheck(QString value)
             continue;
         gd->appendWindow(cw->getTitle());
     }
+
+    gd->selectLastWindow();
 }
 void MainWindow::slotAuthor()
 {
@@ -175,6 +177,7 @@ void MainWindow::slotPlotGraph()
     Frames* frames = pViewerWidget->getFrames();
     GraphDialog* gd = new GraphDialog(frames, this);
     QString legendText;
+    QString chartTitle = "Graph ";
 
     connect(gd,          SIGNAL(signalDataXChanged(QString)), this,
                          SLOT(slotGrapgWindowCheck(QString)));
@@ -211,6 +214,7 @@ void MainWindow::slotPlotGraph()
             CentralWidget* graphWindow = new CentralWidget(this);
             graphWindow->addSeries(vector, legendText, gd->getCurrentX(), "Count");
             graphWindowList.append(graphWindow);
+            graphWindow->setTitle(chartTitle + QString::number(graphWindowList.count()));
 
             connect(graphWindow, SIGNAL(signalCloseWindow(QObject*)), this,
                                  SLOT(slotCloseGraphWindow(QObject*)));

@@ -17,10 +17,6 @@ CentralWidget::CentralWidget(QWidget *parent) : QMainWindow(parent)
 
     XYDefault();
 
-    static uint titleNumber = 0;
-    chart.setTitle("Graph " + QString::number(++titleNumber));
-    panelWidget.setTitle(chart.title());
-
     QFont font = chart.titleFont();
     font.setPixelSize(18);
     chart.setTitleFont(QFont(font));
@@ -66,7 +62,6 @@ CentralWidget::CentralWidget(QWidget *parent) : QMainWindow(parent)
 
     connect(&chartView,      SIGNAL(signalMousePosition(QPointF)), this,
                              SLOT(slotViewXYCoordinate(QPointF)));
-//    this->setWindowFlag(Qt::Widget);
 }
 
 CentralWidget::~CentralWidget()
@@ -140,6 +135,12 @@ void CentralWidget::addSeries(QVector<QPointF> pointVector, QXYSeries::SeriesTyp
 void CentralWidget::addSeries(QVector<QPointF> pointVector, QString legendTitle, QString axsisX_Title, QString axsisY_Title)
 {
     addSeries(pointVector, QXYSeries::SeriesType(panelWidget.getSeriesType()), legendTitle, axsisX_Title, axsisY_Title);
+}
+
+void CentralWidget::setTitle(QString title)
+{
+    chart.setTitle(title);
+    panelWidget.setTitle(chart.title());
 }
 
 QString CentralWidget::getTitle()

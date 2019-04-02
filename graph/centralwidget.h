@@ -34,6 +34,7 @@ public:
     void addSeries(QVector<QPointF> pointVector, QString legendTitle = "",
                    QString axsisX_Title = "X", QString axsisY_Title = "Y");
 
+    void    setTitle(QString title);
     QString getTitle();
     QString getDataXType();
 
