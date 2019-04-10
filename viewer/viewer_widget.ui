@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>813</width>
-    <height>562</height>
+    <width>650</width>
+    <height>492</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -536,79 +536,7 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
-            <widget class="QGroupBox" name="edit_panel">
-             <property name="title">
-              <string/>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <item>
-               <widget class="QPushButton" name="selection_button">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>draw selection</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="../img.qrc">
-                  <normaloff>:/border</normaloff>:/border</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>16</width>
-                  <height>16</height>
-                 </size>
-                </property>
-                <property name="checkable">
-                 <bool>true</bool>
-                </property>
-                <property name="checked">
-                 <bool>false</bool>
-                </property>
-                <property name="flat">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="edit_button">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>edit</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="../img.qrc">
-                  <normaloff>:/pen</normaloff>:/pen</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="cut_button">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>cut</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="../img.qrc">
-                  <normaloff>:/cut</normaloff>:/cut</iconset>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
+            <widget class="ToolsPanel" name="edit_panel" native="true"/>
            </item>
            <item>
             <widget class="QGroupBox" name="data_panel_selection">
@@ -916,14 +844,17 @@ p, li { white-space: pre-wrap; }
    <header>../WTF_Viewer/viewer/clogfilterpanel.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>ToolsPanel</class>
+   <extends>QWidget</extends>
+   <header>../WTF_Viewer/viewer/toolspanel.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>inversion</tabstop>
   <tabstop>graphicsView</tabstop>
-  <tabstop>selection_button</tabstop>
-  <tabstop>edit_button</tabstop>
-  <tabstop>cut_button</tabstop>
   <tabstop>x</tabstop>
   <tabstop>x_selection</tabstop>
   <tabstop>y_selection</tabstop>

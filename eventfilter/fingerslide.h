@@ -43,11 +43,13 @@ signals:
 
     void signalWheel(int);
 
-    void signalMousePos(QPointF);
-    void siganlRect(QRect);
-    void signalRectMove(QPoint);
+    void signalMousePos         (QPointF);
+    void siganlRect             (QRect);
+    void signalRectMove         (QPoint);
 
-    void signalCreateRectItem(QGraphicsRectItem*);
+    void signalCreateRectItem   (QGraphicsRectItem*);
+
+    void signalDrawPoint        (QPointF);
 
 };
 

@@ -12,8 +12,6 @@
 #include "frames/frames.h"
 
 
-
-
 namespace Ui {
 class Viewer_widget;
 }
@@ -25,6 +23,9 @@ class Viewer_widget : public QWidget
 public:
 
     const static int CLOG_SIZE = 256;
+
+    const static int X_HOT = 2;
+    const static int Y_HOT = 23;
 
     explicit Viewer_widget(QWidget *parent = nullptr);
     ~Viewer_widget();
@@ -57,6 +58,8 @@ private:
 
 
     enum fileType {UNDEFINED, TXT, CLOG};
+    enum tabName  {PIX_PROPERTY_TAB, CLOG_FILTER_TAB};
+    //текущий тип файла
     fileType fType;
 
 //используется для нормального вращения QGraphicsView без сложных(для меня) модификаций QTransform
@@ -140,9 +143,11 @@ private slots:
     void        slotViewSelectionPos    (QRect);
     //позиция выделения при перетаскивании мышкой
     void        slotViewSelectionMovePos(QPoint);
+    void        slotDrawPoint           (QPointF point);
 
-    //действия при нажатии кнопки selection_button
-    void        slotSelectionFrame      ();
+    //действия при нажатии кнопки на панели инструментов
+    void        slotSelectionFrame      (bool value);
+    void        slotPen                 (bool value);
     void        slotCut                 ();
 
     //действия при окончании выделения(отпускание кнопки мышки)
@@ -158,6 +163,8 @@ private slots:
     void        slotApplyClogFilter     ();
 
 //    void        slotSetAllTotInCluster(bool value);
+
+    void        slotRepaint             ();
 
 protected:
 //    virtual void closeEvent(QCloseEvent *event);

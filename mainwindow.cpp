@@ -6,7 +6,7 @@
 #include <QHeaderView>
 #include <QDebug>
 
-const QString VERSION =  "0.8.11";
+const QString VERSION =  "0.9.0";
 
 #ifdef Q_OS_Linux
     #define SPLITTER_PATH "/"

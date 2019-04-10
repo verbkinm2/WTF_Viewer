@@ -41,7 +41,8 @@ SOURCES += \
     graph/chart.cpp \
     graph/chartview.cpp \
     graph/customtablemodel.cpp \
-    graph/panelwidget.cpp
+    graph/panelwidget.cpp \
+    viewer/toolspanel.cpp
 
 HEADERS += \
     eventfilter/eventfilter.h \
@@ -59,7 +60,8 @@ HEADERS += \
     graph/chart.h \
     graph/chartview.h \
     graph/customtablemodel.h \
-    graph/panelwidget.h
+    graph/panelwidget.h \
+    viewer/toolspanel.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -72,7 +74,8 @@ FORMS += \
     progressbar.ui \
     viewer/clogfilterpanel.ui \
     graph/graphdialog.ui \
-    graph/panelwidget.ui
+    graph/panelwidget.ui \
+    viewer/toolspanel.ui
 
 RESOURCES += \
     img.qrc

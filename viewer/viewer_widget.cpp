@@ -63,8 +63,10 @@ Viewer_widget::Viewer_widget(QWidget *parent) :
     ui->graphicsView_Origin->viewport()->installEventFilter(eventFilterViewPort);
     connect(eventFilterViewPort2, SIGNAL(signalWheel(int)), this, SLOT(slotScaleWheel(int)));
 
-    connect(ui->selection_button, SIGNAL(clicked()), this, SLOT(slotSelectionFrame()));
-    connect(ui->cut_button, SIGNAL(clicked()), this, SLOT(slotCut()));
+    connect(ui->edit_panel, SIGNAL(signalSelectionToggle(bool)), this, SLOT(slotSelectionFrame(bool)));
+    connect(ui->edit_panel, SIGNAL(signalPenToggle(bool)), this, SLOT(slotPen(bool)));
+    connect(ui->edit_panel, SIGNAL(signalCutClicked(bool)), this, SLOT(slotCut()));
+    connect(ui->edit_panel, SIGNAL(signalRepaint()), this, SLOT(slotRepaint()));
 
     //изменение выделения с помощью спинбоксов
     connect(ui->x_selection, SIGNAL(valueChanged(int)), this, SLOT(slotMoveRectFromKey()) );
@@ -116,7 +118,8 @@ QImage Viewer_widget::getImageFromClogFile(QString fileName)
     file.open(QFile::ReadOnly);
     uint lines = 0;
 
-    while (!file.atEnd()) {
+    while (!file.atEnd())
+    {
         file.readLine();
         lines++;
     }
@@ -167,7 +170,7 @@ void Viewer_widget::setEnableDataPanelSelection(bool state)
     disconnectSelectionSpinBox();
 
     ui->data_panel_selection->setEnabled(state);
-    ui->cut_button->setEnabled(state);
+    ui->edit_panel->buttonCutDisable(!state);
 
     ui->x_selection->setValue(0);
     ui->y_selection->setValue(0);
@@ -192,12 +195,13 @@ void Viewer_widget::setEnableButtonPanel(bool state)
     ui->data_panel->setEnabled(state);
 
     ui->tabWidgetRight->setEnabled(state);
+    ui->edit_panel->setToggleButtons(false);
 
     if(fType == TXT)
-        ui->tabWidgetRight->setTabEnabled(1, false);
+        ui->tabWidgetRight->setTabEnabled(CLOG_FILTER_TAB, false);
     else if(fType == CLOG)
     {
-        ui->tabWidgetRight->setTabEnabled(1, true);
+        ui->tabWidgetRight->setTabEnabled(CLOG_FILTER_TAB, true);
 
         ui->clogFilterPanel->setClusterRange(frames.getClustersLenghtList());
         ui->clogFilterPanel->setTotRange(frames.getTotLenghtList());
@@ -253,6 +257,9 @@ void Viewer_widget::setImage(QImage image)
         connect(eventFilterScene, SIGNAL(signalRelease()), this, SLOT(slotFinishSelection()));
 
         connect(eventFilterScene, SIGNAL(signalCreateRectItem(QGraphicsRectItem*)), this, SLOT(slotCreateRectItem(QGraphicsRectItem*)));
+        connect(eventFilterScene, SIGNAL(signalDrawPoint(QPointF)), this, SLOT(slotDrawPoint(QPointF)));
+
+
     }
     else
         incorrectFile();
@@ -279,6 +286,7 @@ void Viewer_widget::setImageFile(QString fileName)
         fType = UNDEFINED;
         incorrectFile();
     }
+
     QApplication::restoreOverrideCursor();
 }
 void Viewer_widget::disconnectSelectionSpinBox()
@@ -398,6 +406,31 @@ void Viewer_widget::slotApplyClogFilter()
     QApplication::restoreOverrideCursor();
 }
 
+void Viewer_widget::slotRepaint()
+{
+    int max = 0;
+    quint16 value = 0;
+
+    for (quint16 y = 0; y < row; ++y)
+        for (quint16 x = 0; x < column; ++x) {
+            value = arrayOrigin[x][y];
+            max < value ? max = value : NULL ;
+        }
+
+    //наполнение объекта QImage
+    for (quint16 x = 0; x < column; ++x)
+        for (quint16 y = 0; y < row; ++y) {
+            quint16 value = quint16(convert(double(arrayOrigin[x][y]), \
+                                            double(0), \
+                                            double(max), \
+                                            double(0), \
+                                            double(255) ) + 0.5);
+            QColor color(value, value, value);
+            imageOrigin.setPixelColor(x, y, color);
+        }
+    itemForeground->setPixmap(QPixmap::fromImage(imageOrigin));
+}
+
 //void Viewer_widget::slotSetAllTotInCluster(bool value)
 //{
 //    frames.setAllTotInCluster(value);
@@ -411,6 +444,19 @@ void Viewer_widget::slotViewSelectionMovePos(QPoint point)
     ui->y_selection->setValue(point.y());
 
     connectSelectionSpinBox();
+}
+
+void Viewer_widget::slotDrawPoint(QPointF point)
+{
+    int x = int(point.x());
+    int y = int(point.y());
+
+    if(x > 0 && x < column && y > 0 && y < row)
+    {
+        imageOrigin.setPixelColor(x, y, ui->edit_panel->getPenColor());
+        slotInversionCheckBox(ui->inversion->checkState());
+        arrayOrigin[x][y] = ui->edit_panel->getPenValue();
+    }
 }
 void Viewer_widget::slotViewSelectionPos(QRect rect)
 {
@@ -453,8 +499,8 @@ void Viewer_widget::slotFinishSelection()
 {
     ui->graphicsView->unsetCursor();
     setReadOnlyDataPanelSelection(false);
-    ui->selection_button->setChecked(false);
-    ui->cut_button->setEnabled(true);
+    ui->edit_panel->finishSelection();
+    ui->edit_panel->buttonCutDisable(false);
 }
 QImage Viewer_widget::createArrayImage(const QString& fileName)
 {
@@ -520,6 +566,7 @@ void Viewer_widget::incorrectFile()
     disconnect(eventFilterScene, SIGNAL(signalRelease()), this, SLOT(slotFinishSelection()));
 
     disconnect(eventFilterScene, SIGNAL(signalCreateRectItem(QGraphicsRectItem*)), this, SLOT(slotCreateRectItem(QGraphicsRectItem*)));
+    disconnect(eventFilterScene, SIGNAL(signalDrawPoint(QPointF)), this, SLOT(slotDrawPoint(QPointF)));
 
     ui->x->setValue(0);
     ui->y->setValue(0);
@@ -552,9 +599,9 @@ void Viewer_widget::slotScaleWheel(int value)
         ui->graphicsView_Origin->scale(1 / 1.1, 1 / 1.1);
     }
 }
-void Viewer_widget::slotSelectionFrame()
+void Viewer_widget::slotSelectionFrame(bool value)
 {
-    if(ui->selection_button->isChecked())
+    if(value)
     {
         setEnableDataPanelSelection(true);
 
@@ -564,11 +611,19 @@ void Viewer_widget::slotSelectionFrame()
         }
         ui->graphicsView->setCursor(QCursor(Qt::CrossCursor));
     }
-    else
+    if(!value && itemRect == nullptr)
     {
         ui->graphicsView->unsetCursor();
         setEnableDataPanelSelection(false);
     }
+}
+
+void Viewer_widget::slotPen(bool value)
+{
+    if(value)
+       ui->graphicsView->setCursor(QCursor(QPixmap(":/pen").scaled(24,24, Qt::KeepAspectRatio, Qt::SmoothTransformation), X_HOT ,Y_HOT));
+    else
+       ui->graphicsView->unsetCursor();
 }
 void Viewer_widget::slotInversionCheckBox(int state)
 {
@@ -615,6 +670,8 @@ void Viewer_widget::slotCut()
         QMessageBox::critical(this, "Error", "Please, select an area!");
         return;
     }
+
+
     quint16 column  = quint16(ui->width_selection->value());
     quint16 row     = quint16(ui->heigth_selection->value());
 
@@ -688,6 +745,9 @@ void Viewer_widget::slotCut()
     delete[] array;
 
     setImage(image);
+
+    if(fType == CLOG)
+        ui->tabWidgetRight->setTabEnabled(CLOG_FILTER_TAB, false);
 }
 void Viewer_widget::slotRotate()
 {

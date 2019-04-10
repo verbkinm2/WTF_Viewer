@@ -1,4 +1,5 @@
 #include "fingerslide.h"
+#include "../viewer/viewer_widget.h"
 
 #include <QDebug>
 #include <QObject>
@@ -42,6 +43,12 @@ bool FingerSlide::eventFilterScene(QObject* object, QEvent* event)
             rectItem->setRect(QRectF(point, QSize(int(x - point.x()), int(y - point.y()))) );
             emit siganlRect(rectItem->rect().toRect());
         }
+        if(graphView->cursor().hotSpot().x() == Viewer_widget::X_HOT &&
+           graphView->cursor().hotSpot().y() == Viewer_widget::Y_HOT &&
+           QApplication::mouseButtons() == Qt::LeftButton)
+        {
+            emit signalDrawPoint(mevent->scenePos());
+        }
     }
 //Нажатие
     if(event->type() == QEvent::GraphicsSceneMousePress)
@@ -49,22 +56,38 @@ bool FingerSlide::eventFilterScene(QObject* object, QEvent* event)
         QGraphicsSceneMouseEvent* mevent = static_cast<QGraphicsSceneMouseEvent*>(event);
         point = mevent->scenePos();
 
-        //если нажата левая кнопка мыши и при этом идет процесс рисования выделения
+        //не перетаскивать рамку выделения, если мы рисуем карандашом
+        if(scene->items().count() > 2 &&
+            graphView->cursor().hotSpot().x() == Viewer_widget::X_HOT &&
+            graphView->cursor().hotSpot().y() == Viewer_widget::Y_HOT)
+        {
+           QGraphicsRectItem* rectItem = static_cast<QGraphicsRectItem*>(scene->items().at(0));
+           rectItem->setFlags(nullptr);
+        }
+        //если нажата левая кнопка мыши и при этом идет процесс рисования рамки
         if(QApplication::mouseButtons() == Qt::LeftButton && graphView->cursor() == Qt::CrossCursor)
         {
             QGraphicsRectItem* rectItem = scene->addRect(QRectF(QPointF(0,0), QSize(0,0)), \
-                                                         QPen(QBrush(QColor(Qt::red)), 0));
+                                                             QPen(QBrush(QColor(Qt::red)), 0));
             rectItem->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
             rectItem->setZValue(2);
             emit signalCreateRectItem(rectItem);
         }
+        if(graphView->cursor().hotSpot().x() == Viewer_widget::X_HOT &&
+           graphView->cursor().hotSpot().y() == Viewer_widget::Y_HOT)
+        {
+            QGraphicsSceneMouseEvent* mevent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            emit signalDrawPoint(mevent->scenePos());
+        }
     }
 //Отжатие
     if(event->type() == QEvent::GraphicsSceneMouseRelease)
-    {      
+    {
+        //если есть рамка выделения
         if(graphView->scene()->items().length() > 2 )
         {
             QGraphicsRectItem* rectItem = static_cast<QGraphicsRectItem*>(scene->items().at(0));
+            rectItem->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
             qreal x = rectItem->rect().x();
             qreal y = rectItem->rect().y();
             qreal width = rectItem->rect().width();
@@ -99,7 +122,10 @@ bool FingerSlide::eventFilterScene(QObject* object, QEvent* event)
             (y > 0) ? y = y + 0.5 : y = y - 0.5;
             rectItem->setPos(int(x), int(y) );
 
-            emit signalRelease();
+            //если не идет процесс рисования
+            if(graphView->cursor().hotSpot().x() != Viewer_widget::X_HOT &&
+               graphView->cursor().hotSpot().y() != Viewer_widget::Y_HOT)
+                emit signalRelease();
         }
     }
 
@@ -142,8 +168,9 @@ bool FingerSlide::eventFilterViewport(QObject* object, QEvent* event)
 //            return true;
         if(QApplication::mouseButtons() == Qt::LeftButton && \
                 (graphView->scene()->selectedItems().length() < 2 ) && \
-                graphView->cursor() != Qt::CrossCursor \
-                )
+                graphView->cursor() != Qt::CrossCursor &&
+                graphView->cursor().hotSpot().x() != Viewer_widget::X_HOT &&
+                graphView->cursor().hotSpot().y() != Viewer_widget::Y_HOT)
         {
             slide(object, event);
         }
@@ -156,12 +183,9 @@ bool FingerSlide::eventFilter(QObject* object, QEvent* event)
 //    qDebug() << "event filter" << object->objectName() << event->type();
 
     if(object->objectName() == "scene")
-    {
         return eventFilterScene(object, event);
-    }
     else if(object->objectName() == "viewport")
         return eventFilterViewport(object, event);
-
 
     return false;
 }
