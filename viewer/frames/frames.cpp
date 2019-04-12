@@ -268,7 +268,7 @@ QVector<quint16> Frames::getClustersLenghtList()
     return lenghtList;
 }
 
-QVector<QPointF> Frames::getClusterVectorTot(quint16 cluserLenght)
+QVector<QPointF> Frames::getClusterVectorTot(quint16 clusterLenght)
 {
     QVector<QPointF> vector;
     //key = tot, value = count
@@ -276,7 +276,7 @@ QVector<QPointF> Frames::getClusterVectorTot(quint16 cluserLenght)
 
     for (quint16 frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
         for (quint16 clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
-            if(getClusterLenght(frameNumber, clusterNumber) == cluserLenght)
+            if(getClusterLenght(frameNumber, clusterNumber) == clusterLenght || clusterLenght == 0)
                 for (quint16 eventNumber = 0; eventNumber < getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber)
                 {
                     quint16 key = getEPoint(frameNumber, clusterNumber, eventNumber).tot;

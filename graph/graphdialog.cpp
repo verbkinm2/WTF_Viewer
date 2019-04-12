@@ -11,6 +11,7 @@ GraphDialog::GraphDialog(Frames *frames, QWidget *parent) :
 
 //    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
+    ui->DataY->addItem("All ");
     foreach(quint16 value, frames->getClustersLenghtList())
         ui->DataY->addItem(QString::number(value));
 

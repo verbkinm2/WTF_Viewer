@@ -36,8 +36,10 @@ public:
 private:
 
     QMenu*              pMenuFile       = nullptr;
-    QMenu*              pMenuAbout      = nullptr;
     QMenu*              pMenuGraph      = nullptr;
+    QMenu*              pMenuAbout      = nullptr;
+    QMenu*              pMenuSettings   = nullptr;
+
 
     QList<CentralWidget*> graphWindowList;
 

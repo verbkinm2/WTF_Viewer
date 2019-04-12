@@ -451,7 +451,7 @@ void Viewer_widget::slotDrawPoint(QPointF point)
     int x = int(point.x());
     int y = int(point.y());
 
-    if(x > 0 && x < column && y > 0 && y < row)
+    if(x >= 0 && x < column && y >= 0 && y < row)
     {
         imageOrigin.setPixelColor(x, y, ui->edit_panel->getPenColor());
         slotInversionCheckBox(ui->inversion->checkState());

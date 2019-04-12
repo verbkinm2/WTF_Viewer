@@ -6,7 +6,7 @@
 #include <QHeaderView>
 #include <QDebug>
 
-const QString VERSION =  "0.9.0";
+const QString VERSION =  "0.9.1";
 
 #ifdef Q_OS_Linux
     #define SPLITTER_PATH "/"
@@ -190,7 +190,7 @@ void MainWindow::slotPlotGraph()
 
     if(gd->exec() == QDialog::Accepted)
     {
-//        QApplication::setOverrideCursor(Qt::WaitCursor);
+        QApplication::setOverrideCursor(Qt::WaitCursor);
 
         QVector<QPointF> vector;
         if(gd->getCurrentX() == "Tots")
@@ -232,9 +232,7 @@ void MainWindow::slotPlotGraph()
             graphWindow->addSeries(vector, legendText, gd->getCurrentX(), "Count");
             graphWindow->show();
         }
-
         QApplication::restoreOverrideCursor();
-
     }
 
     delete gd;
