@@ -21,7 +21,7 @@ ClogFilterPanel::~ClogFilterPanel()
     delete ui;
 }
 
-void ClogFilterPanel::setClusterRange(QVector<quint16> vector)
+void ClogFilterPanel::setClusterRange(QVector<int> vector)
 {
     disconnectSignals();
 
@@ -32,7 +32,7 @@ void ClogFilterPanel::setClusterRange(QVector<quint16> vector)
     clusterListBegin.clear();
     clusterListEnd.clear();
 
-    foreach(quint16 value, vector)
+    foreach(int value, vector)
         clusterListModel << QString::number(value);
 
     ui->clusterRangeBegin->addItems(clusterListModel);
@@ -167,7 +167,7 @@ void ClogFilterPanel::slotApplyFilter()
     emit signalApplyFilter();
 }
 
-void ClogFilterPanel::setTotRange(QVector<quint16> vector)
+void ClogFilterPanel::setTotRange(QVector<int> vector)
 {
     disconnectSignals();
 
@@ -178,7 +178,7 @@ void ClogFilterPanel::setTotRange(QVector<quint16> vector)
     totListBegin.clear();
     totListEnd.clear();
 
-    foreach(quint16 value, vector)
+    foreach(int value, vector)
         totListModel << QString::number(value);
 
     ui->totRangeBegin->addItems(totListModel);
@@ -210,24 +210,24 @@ void ClogFilterPanel::setTotRange(QVector<quint16> vector)
     connectSignals();
 }
 
-quint16 ClogFilterPanel::getClusterBegin() const
+int ClogFilterPanel::getClusterBegin() const
 {
-    return quint16(ui->clusterRangeBegin->currentText().toInt());
+    return int(ui->clusterRangeBegin->currentText().toInt());
 }
 
-quint16 ClogFilterPanel::getClusterEnd() const
+int ClogFilterPanel::getClusterEnd() const
 {
-    return quint16(ui->clusterRangeEnd->currentText().toInt());
+    return int(ui->clusterRangeEnd->currentText().toInt());
 }
 
-quint16 ClogFilterPanel::getTotBegin() const
+int ClogFilterPanel::getTotBegin() const
 {
-    return quint16(ui->totRangeBegin->currentText().toInt());
+    return int(ui->totRangeBegin->currentText().toInt());
 }
 
-quint16 ClogFilterPanel::getTotEnd() const
+int ClogFilterPanel::getTotEnd() const
 {
-    return quint16(ui->totRangeEnd->currentText().toInt());
+    return int(ui->totRangeEnd->currentText().toInt());
 }
 
 bool ClogFilterPanel::isClusterEnable()

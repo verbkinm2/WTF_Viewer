@@ -6,6 +6,8 @@
 #include <QImage>
 #include <QCloseEvent>
 #include <QGraphicsScene>
+#include <QSettings>
+
 //#include <QGraphicsPathItem>
 
 #include "../eventfilter/fingerslide.h"
@@ -27,9 +29,10 @@ public:
     const static int X_HOT = 2;
     const static int Y_HOT = 23;
 
-    explicit Viewer_widget(QWidget *parent = nullptr);
+    explicit Viewer_widget(QSettings& setting, QWidget *parent = nullptr);
     ~Viewer_widget();
 
+    QSettings*  pSettings = nullptr;
     //получение Qimage из txt файла
     QImage      getImageFromTxtFile     (QString fileName);
     //получение Qimage из clog файла
@@ -80,17 +83,19 @@ private:
     Frames frames;
 
     //двумерный массив с данными из файла
-    quint16**       arrayOrigin             = nullptr;
+    int**       arrayOrigin             = nullptr;
+    int**       arrayMask               = nullptr;
 
     //переменные для хранения кол-ва строк и столбцов файла
-    quint16 column  = 0;
-    quint16 row     = 0;
+    int column  = 0;
+    int row     = 0;
 
     //фильтр событий для сцены и представления
     FingerSlide* eventFilterScene = nullptr;
 
     //возвращает рисунок из файла или QImage::Format_Invalid
     QImage      createArrayImage        (const QString& fileName);
+    int         findMaxInArrayOrigin    ();
 
     //преобразование диапазонов
     double      convert                 (double value,
@@ -119,7 +124,15 @@ private:
     void        connectSelectionSpinBox ();
 
     void        applyClogFilter(QImage& image);
-    void        applyClogFilterAdditionalFunction(const ePoint & point, quint16 & max);
+    void        applyClogFilterAdditionalFunction(const ePoint & point);
+
+    void        imageSettingsForArray();
+    void        imageSettingsForImage(QImage& image);
+    //создаёт рамку согласно настройкам
+    void        createFrameInArray();
+    //маскируем выбранные пиксели
+    void        createMaskInArray();
+
 
 private slots:
     //поворот
@@ -158,7 +171,7 @@ private slots:
 
     void        slotCreateRectItem(QGraphicsRectItem* item);
 
-//    void        slotClogFilterRangeChange(QObject* obj, quint16 value);
+//    void        slotClogFilterRangeChange(QObject* obj, int value);
 
     void        slotApplyClogFilter     ();
 

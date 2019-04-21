@@ -16,11 +16,13 @@
 #include <QDebug>
 
 
-Viewer_widget::Viewer_widget(QWidget *parent) :
+Viewer_widget::Viewer_widget(QSettings &setting, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Viewer_widget)
 {
     this->ui->setupUi(this);
+
+    pSettings = &setting;
 
     //повороты
     connect(ui->rotate_plus, SIGNAL(clicked()), this, SLOT(slotRotate()));
@@ -75,7 +77,7 @@ Viewer_widget::Viewer_widget(QWidget *parent) :
     connect(ui->heigth_selection, SIGNAL(valueChanged(int)), this, SLOT(slotMoveRectFromKey()) );
 
     //
-//    connect(ui->clogFilterPanel, SIGNAL(signalRangeChanged(QObject*, quint16)),   this, SLOT(slotClogFilterRangeChange(QObject*, quint16)));
+//    connect(ui->clogFilterPanel, SIGNAL(signalRangeChanged(QObject*, int)),   this, SLOT(slotClogFilterRangeChange(QObject*, int)));
     connect(ui->clogFilterPanel, SIGNAL(signalApplyFilter()),       this, SLOT(slotApplyClogFilter()));
 //    connect(ui->clogFilterPanel, SIGNAL(signalPixGroupMidiPixSet(bool)), &frames, SLOT(slotSetMediPix(bool)));
 //    connect(ui->clogFilterPanel, SIGNAL(signalAllTotInClusterToggled(bool)), this, SLOT(slotSetAllTotInCluster(bool)));
@@ -140,9 +142,9 @@ QImage Viewer_widget::getImageFromClogFile(QString fileName)
     image.fill(Qt::black);
 
     //выделяем память для основного массива
-    arrayOrigin = new quint16 *[column];
-    for (quint16 i = 0; i < column; ++i)
-        arrayOrigin[i] = new quint16[row];
+    arrayOrigin = new int *[column];
+    for (int i = 0; i < column; ++i)
+        arrayOrigin[i] = new int[row];
 
 
     //наполняем основной массив данными согласно установленному фильтру
@@ -307,39 +309,46 @@ void Viewer_widget::connectSelectionSpinBox()
 void Viewer_widget::applyClogFilter(QImage& image)
 {
     //обнуляем основной массив
-   for (quint16 x = 0; x < column; ++x)
-       for (quint16 y = 0; y < row; ++y)
+   for (int x = 0; x < column; ++x)
+       for (int y = 0; y < row; ++y)
            arrayOrigin[x][y] = 0;
 
-    quint16 max = 0;
-    for (quint16 frameNumber = 0; frameNumber < frames.getFrameCount(); ++frameNumber)
-        for (quint16 clusterNumber = 0; clusterNumber < frames.getClusterCount(frameNumber); ++clusterNumber)
+    for (int frameNumber = 0; frameNumber < frames.getFrameCount(); ++frameNumber)
+        for (int clusterNumber = 0; clusterNumber < frames.getClusterCount(frameNumber); ++clusterNumber)
         {
             if( frames.clusterInRange(frames.getClusterLenght(frameNumber, clusterNumber),
-                                      ui->clogFilterPanel->getClusterBegin(), ui->clogFilterPanel->getClusterEnd()) &&
+                                      ui->clogFilterPanel->getClusterBegin(),
+                                      ui->clogFilterPanel->getClusterEnd())
+                                      &&
                 frames.totInRange(frameNumber, clusterNumber,
-                                  ui->clogFilterPanel->getTotBegin(), ui->clogFilterPanel->getTotEnd()))
+                                  ui->clogFilterPanel->getTotBegin(),
+                                  ui->clogFilterPanel->getTotEnd()) )
             {
                 if(ui->clogFilterPanel->isAllTotInCluster())
-                    for (quint16 eventNumber = 0; eventNumber < frames.getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber)
+                    for (int eventNumber = 0; eventNumber < frames.getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber)
                     {
                         ePoint point = frames.getEPoint(frameNumber, clusterNumber, eventNumber);
-                        applyClogFilterAdditionalFunction(point, max);
+                        applyClogFilterAdditionalFunction(point);
                     }
                 else
                 {
                     QList<ePoint> listePoint = frames.getListTotInRange(frameNumber, clusterNumber,
                                                                         ui->clogFilterPanel->getTotBegin(), ui->clogFilterPanel->getTotEnd());
                     foreach (ePoint point, listePoint)
-                        applyClogFilterAdditionalFunction(point, max);
+                        applyClogFilterAdditionalFunction(point);
                 }
             }
         }
 
+    //проверяем настройки для картинки такие как рамка и маскирование пикселей
+    imageSettingsForArray();
+
+    int max = findMaxInArrayOrigin();
+
     //наполнение объекта QImage
-    for (quint16 x = 0; x < column; ++x)
-        for (quint16 y = 0; y < row; ++y) {
-            quint16 value = quint16(convert(double(arrayOrigin[x][y]), \
+    for (int x = 0; x < column; ++x)
+        for (int y = 0; y < row; ++y) {
+            int value = int(convert(double(arrayOrigin[x][y]), \
                                             double(0), \
                                             double(max), \
                                             double(0), \
@@ -347,9 +356,11 @@ void Viewer_widget::applyClogFilter(QImage& image)
             QColor color(value, value, value);
             image.setPixelColor(x, y, color);
         }
+    //цвет пикселей, которым применилась маска
+    imageSettingsForImage(image);
 }
 //для меньшего кол-ва строк исполбзуем эту функцию
-void Viewer_widget::applyClogFilterAdditionalFunction(const ePoint &point, quint16 &max)
+void Viewer_widget::applyClogFilterAdditionalFunction(const ePoint &point)
 {
     //если координаты точек выходят за границы - это просто игнорируется
     if(point.x >= column || point.y >= row)
@@ -359,9 +370,98 @@ void Viewer_widget::applyClogFilterAdditionalFunction(const ePoint &point, quint
         arrayOrigin[point.x][point.y] += 1;
     else
         arrayOrigin[point.x][point.y] += point.tot;
-    //максимальное значение для дальнейшего преобразования диапазонов
-    if(max < arrayOrigin[point.x][point.y])
-        max = arrayOrigin[point.x][point.y];
+}
+
+void Viewer_widget::imageSettingsForImage(QImage &image)
+{
+    if(pSettings->value("SettingsImage/MasquradingGroupBox").toBool())
+    {
+        //рисуем маскированые пиксели выбраным цветом
+        for (int x = 0; x < column; ++x)
+            for (int y = 0; y < row; ++y)
+                if(arrayMask[x][y] > 0)
+                    image.setPixelColor(x, y, QColor(pSettings->value("SettingsImage/maskColor").toString()));
+        //удаляем массив для маскирования пикселей
+        for (int i = 0; i < column; ++i)
+            delete[] arrayMask[i];
+        delete[] arrayMask;
+        arrayMask = nullptr;
+    }
+}
+
+void Viewer_widget::imageSettingsForArray()
+{
+    pSettings->beginGroup("SettingsImage");
+
+    //если в настройка включено рисование рамки то рисуем её
+    if(pSettings->value("FrameGroupBox").toBool())
+        createFrameInArray();
+
+    //если в настройка включено маскирование пискелей то маскируем их
+    if(pSettings->value("MasquradingGroupBox").toBool())
+        createMaskInArray();
+
+    pSettings->endGroup();
+}
+
+void Viewer_widget::createFrameInArray()
+{
+    int width = pSettings->value("frameWidth").toInt();
+    if(width > column || width > row) width = 0;
+
+    int value = pSettings->value("frameValue").toInt();
+
+    //верх
+    for (int x = 0; x < column; ++x)
+        for (int y = 0; y < width; ++y)
+            arrayOrigin[x][y] = value;
+    //низ
+    for (int x = 0; x < column; ++x)
+        for (int y = row - 1; y >= row - width; --y)
+            arrayOrigin[x][y] = value;
+    //лево
+    for (int y = 0; y < row; ++y)
+        for (int x = 0; x < width; ++x)
+            arrayOrigin[x][y] = value;
+    //право
+    for (int y = 0; y < row; ++y)
+        for (int x = column - 1; x >= column - width; --x)
+            arrayOrigin[x][y] = value;
+}
+
+void Viewer_widget::createMaskInArray()
+{
+    //выделяем память для массива маскирования пикселей, удаляем его в функции imageSettingsForImage
+    arrayMask = new int *[column];
+    for (int i = 0; i < column; ++i)
+        arrayMask[i] = new int[row];
+    //обнуляем его
+    for (int x = 0; x < column; ++x)
+        for (int y = 0; y < row; ++y)
+            arrayMask[x][y] = 0;
+
+    int value       = pSettings->value("maskValue").toInt();
+    int newValue    = pSettings->value("maskNewValue").toInt();
+    bool after      = pSettings->value("maskAfter").toBool();
+
+    //пробегаемся по всему массиву
+    for (int x = 0; x < column; ++x)
+        for (int y = 0; y < row; ++y)
+        {
+            if(after)
+            {
+                if(arrayOrigin[x][y] >= value)
+                {
+                    arrayOrigin[x][y] = newValue;
+                    arrayMask[x][y] = 1;
+                }
+            }
+            else if(arrayOrigin[x][y] <= value)
+            {
+                arrayOrigin[x][y] = newValue;
+                arrayMask[x][y] = 1;
+            }
+        }
 }
 // !!!
 void Viewer_widget::slotMoveRectFromKey()
@@ -377,20 +477,6 @@ void Viewer_widget::slotCreateRectItem(QGraphicsRectItem * item)
 {
     itemRect = item;
 }
-
-//void Viewer_widget::slotClogFilterRangeChange(QObject *obj, quint16 value)
-//{
-//    qDebug() << obj->objectName() << value;
-
-//    if(obj->objectName() == "clusterRangeBegin")
-//        frames.setClusterRangeBegin(value);
-//    else if(obj->objectName() == "clusterRangeEnd")
-//        frames.setClusterRangeEnd(value);
-//    else if(obj->objectName() == "totRangeBegin")
-//        frames.setTotRangeBegin(value);
-//    else if(obj->objectName() == "totRangeEnd")
-//        frames.setTotRangeEnd(value);
-//}
 
 void Viewer_widget::slotApplyClogFilter()
 {
@@ -408,19 +494,12 @@ void Viewer_widget::slotApplyClogFilter()
 
 void Viewer_widget::slotRepaint()
 {
-    int max = 0;
-    quint16 value = 0;
-
-    for (quint16 y = 0; y < row; ++y)
-        for (quint16 x = 0; x < column; ++x) {
-            value = arrayOrigin[x][y];
-            max < value ? max = value : NULL ;
-        }
+    int max = findMaxInArrayOrigin();
 
     //наполнение объекта QImage
-    for (quint16 x = 0; x < column; ++x)
-        for (quint16 y = 0; y < row; ++y) {
-            quint16 value = quint16(convert(double(arrayOrigin[x][y]), \
+    for (int x = 0; x < column; ++x)
+        for (int y = 0; y < row; ++y) {
+            int value = int(convert(double(arrayOrigin[x][y]), \
                                             double(0), \
                                             double(max), \
                                             double(0), \
@@ -430,11 +509,6 @@ void Viewer_widget::slotRepaint()
         }
     itemForeground->setPixmap(QPixmap::fromImage(imageOrigin));
 }
-
-//void Viewer_widget::slotSetAllTotInCluster(bool value)
-//{
-//    frames.setAllTotInCluster(value);
-//}
 
 void Viewer_widget::slotViewSelectionMovePos(QPoint point)
 {
@@ -506,8 +580,8 @@ QImage Viewer_widget::createArrayImage(const QString& fileName)
 {
     ListData data(fileName);
 
-    column  = quint16(data.column);
-    row     = quint16(data.row);
+    column  = int(data.column);
+    row     = int(data.row);
 
     QImage image(column, row, QImage::Format_ARGB32_Premultiplied);
 
@@ -515,26 +589,28 @@ QImage Viewer_widget::createArrayImage(const QString& fileName)
         return QImage(QSize(0,0),QImage::Format_Invalid);
 
     //выделяем память для основного массива
-    arrayOrigin = new quint16 *[column];
-    for (quint16 i = 0; i < column; ++i)
-        arrayOrigin[i] = new quint16[row];
+    arrayOrigin = new int *[column];
+    for (int i = 0; i < column; ++i)
+        arrayOrigin[i] = new int[row];
 
-    //max необходима для дальнейшего преобразования диапазонов
-    int max = 0;
     //Заполнение матрицы данными из файла
-    quint16 iterrator = 0;
-    quint16 value = 0;
-    for (quint16 y = 0; y < row; ++y)
-        for (quint16 x = 0; x < column; ++x) {
+    int iterrator = 0;
+    int value = 0;
+    for (int y = 0; y < row; ++y)
+        for (int x = 0; x < column; ++x) {
             value =  data.list.at(iterrator++);
             arrayOrigin[x][y] = value;
-            max < value ? max = value : NULL ;
         }
 
+    //проверяем настройки для картинки такие как рамка и маскирование пикселей
+    imageSettingsForArray();
+
+    int max = findMaxInArrayOrigin();
+
     //наполнение объекта QImage
-    for (quint16 x = 0; x < column; ++x)
-        for (quint16 y = 0; y < row; ++y) {
-            quint16 value = quint16(convert(double(arrayOrigin[x][y]), \
+    for (int x = 0; x < column; ++x)
+        for (int y = 0; y < row; ++y) {
+            int value = int(convert(double(arrayOrigin[x][y]), \
                                             double(0), \
                                             double(max), \
                                             double(0), \
@@ -543,11 +619,27 @@ QImage Viewer_widget::createArrayImage(const QString& fileName)
             image.setPixelColor(x, y, color);
         }
 
+    imageSettingsForImage(image);
+
     return image;
+}
+
+int Viewer_widget::findMaxInArrayOrigin()
+{
+    int max = 0;
+    int value = 0;
+
+    for (int y = 0; y < row; ++y)
+        for (int x = 0; x < column; ++x) {
+            value = arrayOrigin[x][y];
+            if(max < value) max = value;
+        }
+
+    return max;
 }
 double Viewer_widget::convert(double value, double From1, double From2, double To1, double To2)
 {
-    if( (quint16(From1) == quint16(From2)) ||  (quint16(To1) == quint16(To2)))
+    if( (int(From1) == int(From2)) ||  (int(To1) == int(To2)))
         return 0.0;
 
     return (value-From1)/(From2-From1)*(To2-To1)+To1;
@@ -633,14 +725,6 @@ void Viewer_widget::slotInversionCheckBox(int state)
         imageBackground.fill(Qt::black);
         itemBackground->setPixmap(QPixmap::fromImage(imageBackground));
         itemForeground->setPixmap(QPixmap::fromImage(imageOrigin));
-//        if(scene.items().length() > 2)
-//            scene.removeItem(scene.items().at(2));
-//        else
-//            scene.clear();
-
-//        imageBackground.fill(Qt::black);
-//        scene.addPixmap(QPixmap::fromImage(imageBackground));
-//        scene.addPixmap(QPixmap::fromImage(imageOrigin));
         break;
     case (Qt::Checked):
         imageBackground.fill(Qt::white);
@@ -648,20 +732,8 @@ void Viewer_widget::slotInversionCheckBox(int state)
         QImage inversion(imageOrigin);
         inversion.invertPixels(QImage::InvertRgb);
         itemForeground->setPixmap(QPixmap::fromImage(inversion));
-
-//        if(scene.items().length() > 2)
-//            scene.removeItem(scene.items().at(2));
-//        else
-//            scene.clear();
-//        QImage inversion(imageOrigin);
-//        inversion.invertPixels(QImage::InvertRgb);
-//        imageBackground.fill(Qt::white);
-////        scene.addPixmap(QPixmap::fromImage(imageBackground));
-//        scene.addPixmap(QPixmap::fromImage(inversion));
         break;
     }
-
-//    qDebug() << scene.items();
 }
 void Viewer_widget::slotCut()
 {
@@ -672,8 +744,8 @@ void Viewer_widget::slotCut()
     }
 
 
-    quint16 column  = quint16(ui->width_selection->value());
-    quint16 row     = quint16(ui->heigth_selection->value());
+    int column  = int(ui->width_selection->value());
+    int row     = int(ui->heigth_selection->value());
 
     QImage image(column, row, QImage::Format_ARGB32_Premultiplied);
 
@@ -681,15 +753,15 @@ void Viewer_widget::slotCut()
 //        setImage(QImage(QSize(0,0),QImage::Format_Invalid));
 
     //Временный массив для данных преобразованного диапазона
-    quint16** array;
+    int** array;
 
     //выделяем память для временного массива
-    array = new quint16 *[column];
-    for (quint16 i = 0; i < column; ++i)
-        array[i] = new quint16[row];
+    array = new int *[column];
+    for (int i = 0; i < column; ++i)
+        array[i] = new int[row];
 
     //Заполнение временного массива данными из выделенной области
-    quint16 value = 0;
+    int value = 0;
     for (qint16 x = qint16(ui->x_selection->value()), tmpX = 0; tmpX < column; ++x, ++tmpX)
         for (qint16 y = qint16(ui->y_selection->value()), tmpY = 0; tmpY < row; ++y, ++tmpY) {
             if( (x < 0) || (x >= this->column) || (y < 0) || (y >= this->row) )
@@ -705,25 +777,24 @@ void Viewer_widget::slotCut()
     this->row   = row;
 
     //выделяем память для основного массива
-    arrayOrigin = new quint16 *[column];
-    for (quint16 i = 0; i < column; ++i)
-        arrayOrigin[i] = new quint16[row];
+    arrayOrigin = new int *[column];
+    for (int i = 0; i < column; ++i)
+        arrayOrigin[i] = new int[row];
 
-    //max необходима для дальнейшего преобразования диапазонов
-    int max = 0;
     value = 0;
     //копируем временный массив в основной
-    for (quint16 x = 0; x < column; ++x)
-        for (quint16 y = 0; y < row; ++y) {
+    for (int x = 0; x < column; ++x)
+        for (int y = 0; y < row; ++y) {
             value = array[x][y];
             arrayOrigin[x][y] = value;
-            max < value ? max = value : NULL ;
         }
 
+    int max = findMaxInArrayOrigin();
+
     // преобразование диапазонов
-    for (quint16 x = 0; x < column; ++x)
-        for (quint16 y = 0; y < row; ++y) {
-            quint16 value = quint16(convert(double(arrayOrigin[x][y]), \
+    for (int x = 0; x < column; ++x)
+        for (int y = 0; y < row; ++y) {
+            int value = int(convert(double(arrayOrigin[x][y]), \
                                             double(0), \
                                             double(max), \
                                             double(0), \
@@ -732,9 +803,9 @@ void Viewer_widget::slotCut()
         }
 
     //наполнение объекта QImage
-    for (quint16 x = 0; x < column; ++x)
-        for (quint16 y = 0; y < row; ++y) {
-            quint16 value = array[x][y];
+    for (int x = 0; x < column; ++x)
+        for (int y = 0; y < row; ++y) {
+            int value = array[x][y];
             QColor color(value, value, value);
             image.setPixelColor(x, y, color);
         }
@@ -784,8 +855,8 @@ void Viewer_widget::slotResetTransform()
 }
 void Viewer_widget::slotViewPosition(QPointF pos)
 {
-    quint16 width = quint16(scene.sceneRect().width());
-    quint16 height = quint16(scene.sceneRect().height());
+    int width = int(scene.sceneRect().width());
+    int height = int(scene.sceneRect().height());
 
     if(pos.x() < 0 || pos.x() > width || pos.y() < 0 || pos.y() > height)
     {
@@ -795,11 +866,11 @@ void Viewer_widget::slotViewPosition(QPointF pos)
     }
     else if(arrayOrigin != nullptr)
     {
-        quint16 x = quint16(pos.x());
-        quint16 y = quint16(pos.y());
+        int x = int(pos.x());
+        int y = int(pos.y());
 
         if( (x < column) && (y < row) ){
-            quint16 data = arrayOrigin[x][y];
+            int data = arrayOrigin[x][y];
             ui->x->setValue(x);
             ui->y->setValue(y);
             ui->data->setValue(data);

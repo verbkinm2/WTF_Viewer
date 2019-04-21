@@ -13,18 +13,18 @@ class Frames : public QObject
 public:
     Frames(QObject *parent = nullptr);
 
-    void    addFrame        (uint number);
+    void    addFrame        (int number);
     void    appendCluster   ();
 
     void    appendEPoint    (ePoint point);
-    void    appendEPoint    (quint8 x, quint8 y, quint16 tot);
+    void    appendEPoint    (quint8 x, quint8 y, int tot);
 
-    quint16 getFrameCount();
-    quint16 getClusterCount(quint16 frameNumber);
-    quint16 getClusterLenght(quint16 frameNumber, quint16 clusterNumber);
-    quint16 getEventCountInCluster(quint16 frameNumber, quint16 clusterNumber);
+    int getFrameCount();
+    int getClusterCount(int frameNumber);
+    int getClusterLenght(int frameNumber, int clusterNumber);
+    int getEventCountInCluster(int frameNumber, int clusterNumber);
 
-    ePoint getEPoint(quint16 frameNumber, quint16 clusterNumber, quint16 eventNumber) const;
+    ePoint getEPoint(int frameNumber, int clusterNumber, int eventNumber) const;
 
     void    setFile         (QString path);
 
@@ -40,32 +40,32 @@ public:
     void    clear           ();
     const QList<OneFrame>&  getList();
 
-    bool    clusterInRange  (quint16 clusterLength,
-                             quint16 clusterRangeBegin, quint16 clusterRangeEnd);
-    bool    totInRange      (uint frameNumber, quint16 clusterNumber,
-                             quint16 totRangeBegin, quint16 totRangeEnd);
+    bool    clusterInRange  (int clusterLength,
+                             int clusterRangeBegin, int clusterRangeEnd);
+    bool    totInRange      (int frameNumber, int clusterNumber,
+                             int totRangeBegin, int totRangeEnd);
 
-    QList<ePoint> getListTotInRange(quint16 frameNumber, quint16 clusterNumber,
-                                    quint16 totRangeBegin, quint16 totRangeEnd) const;
+    QList<ePoint> getListTotInRange(int frameNumber, int clusterNumber,
+                                    int totRangeBegin, int totRangeEnd) const;
 
-//    quint16  getClusterRangeBegin() const;
-//    void    setClusterRangeBegin(const quint16 &value);
+//    int  getClusterRangeBegin() const;
+//    void    setClusterRangeBegin(const int &value);
 
-//    quint16 getClusterRangeEnd() const;
-//    void    setClusterRangeEnd(const quint16 &value);
+//    int getClusterRangeEnd() const;
+//    void    setClusterRangeEnd(const int &value);
 
-//    quint16 getTotRangeBegin() const;
-//    void setTotRangeBegin(const quint16 &value);
+//    int getTotRangeBegin() const;
+//    void setTotRangeBegin(const int &value);
 
-//    quint16 getTotRangeEnd() const;
-//    void setTotRangeEnd(const quint16 &value);
+//    int getTotRangeEnd() const;
+//    void setTotRangeEnd(const int &value);
 
-    QVector<quint16> getClustersLenghtList();
+    QVector<int> getClustersLenghtList();
     //получение вектора кол-ва тотов с кластера заданного размера
-    QVector<QPointF> getClusterVectorTot(quint16 clusterLenght);
+    QVector<QPointF> getClusterVectorTot(int clusterLenght);
     //получение вектора кол-ва кластеров
     QVector<QPointF> getClusterVector();
-    QVector<quint16> getTotLenghtList();
+    QVector<int> getTotLenghtList();
 
 //    bool getAllTotInCluster() const;
 //    bool isAllTotInCluster() const;
@@ -74,21 +74,21 @@ public:
 private:
     QList<OneFrame> list;
 
-//    quint16  clusterRangeBegin   = 0;
-//    quint16  clusterRangeEnd     = std::numeric_limits<quint16>::max();
+//    int  clusterRangeBegin   = 0;
+//    int  clusterRangeEnd     = std::numeric_limits<int>::max();
 
-//    quint16 totRangeBegin       = 0;
-//    quint16 totRangeEnd         = std::numeric_limits<quint16>::max();
+//    int totRangeBegin       = 0;
+//    int totRangeEnd         = std::numeric_limits<int>::max();
 
 //    bool    mediPix             = true;
 //    bool    timePix             = false;
 //    bool    allTotInCluster     = true;
 
     //максимальное и минимальное значение ToT во всех фреймах
-//    quint16    maxTot           = 0;
-//    quint16    maxCluster       = 0;
-//    quint16    minTot           = std::numeric_limits<quint16>::max();
-//    quint16    minCluster       = std::numeric_limits<quint16>::max();
+//    int    maxTot           = 0;
+//    int    maxCluster       = 0;
+//    int    minTot           = std::numeric_limits<int>::max();
+//    int    minCluster       = std::numeric_limits<int>::max();
 
 private slots:
 //    void    slotSetMediPix(bool checked);

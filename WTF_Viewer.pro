@@ -25,43 +25,45 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-    eventfilter/fingerslide.cpp \
     eventfilter/eventfilter.cpp \
+    eventfilter/fingerslide.cpp \
     export/export.cpp \
-    viewer/checkFile/checkfile.cpp \
-    viewer/frames/frames.cpp \
-    viewer/frames/oneframe.cpp \
-    viewer/viewer_widget.cpp \
-    progressbar.cpp \
-    viewer/clogfilterpanel.cpp \
-    graph/graphdialog.cpp \
     graph/centralwidget.cpp \
     graph/chart.cpp \
     graph/chartview.cpp \
     graph/customtablemodel.cpp \
+    graph/graphdialog.cpp \
     graph/panelwidget.cpp \
-    viewer/toolspanel.cpp
+    settings/settingsimage.cpp \
+    viewer/checkFile/checkfile.cpp \
+    viewer/frames/frames.cpp \
+    viewer/frames/oneframe.cpp \
+    viewer/clogfilterpanel.cpp \
+    viewer/toolspanel.cpp \
+    viewer/viewer_widget.cpp \
+    main.cpp \
+    mainwindow.cpp \
+    progressbar.cpp
 
 HEADERS += \
     eventfilter/eventfilter.h \
     eventfilter/fingerslide.h \
     export/export.h \
-    viewer/checkFile/checkfile.h \
-    viewer/frames/frames.h \
-    viewer/frames/oneframe.h \
-    viewer/viewer_widget.h \
-    mainwindow.h \
-    progressbar.h \
-    viewer/clogfilterpanel.h \
-    graph/graphdialog.h \
     graph/centralwidget.h \
     graph/chart.h \
     graph/chartview.h \
     graph/customtablemodel.h \
+    graph/graphdialog.h \
     graph/panelwidget.h \
-    viewer/toolspanel.h
+    settings/settingsimage.h \
+    viewer/checkFile/checkfile.h \
+    viewer/frames/frames.h \
+    viewer/frames/oneframe.h \
+    viewer/clogfilterpanel.h \
+    viewer/toolspanel.h \
+    viewer/viewer_widget.h \
+    mainwindow.h \
+    progressbar.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -69,30 +71,19 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 FORMS += \
-    viewer\viewer_widget.ui \
     export/export.ui \
-    progressbar.ui \
-    viewer/clogfilterpanel.ui \
     graph/graphdialog.ui \
     graph/panelwidget.ui \
-    viewer/toolspanel.ui
+    settings/settingsimage.ui \
+    viewer/clogfilterpanel.ui \
+    viewer/toolspanel.ui \
+    viewer/viewer_widget.ui \
+    progressbar.ui
 
 RESOURCES += \
     img.qrc
 
-SUBDIRS += \
-    WTF_Viewer.pro
+DISTFILES +=
 
-DISTFILES += \
-    img/atom.png \
-    img/author.png \
-    img/cut.png \
-    img/exit.png \
-    img/minus.png \
-    img/pen.png \
-    img/plus.png \
-    img/qt_logo.png \
-    img/reset.png \
-    img/rotate_minus.png \
-    img/rotate_plus.png \
-    img/sekection_border.png
+
+

@@ -13,7 +13,7 @@ Frames::Frames(QObject *parent) : QObject(parent)
 
 }
 
-void Frames::addFrame(uint number)
+void Frames::addFrame(int number)
 {
     OneFrame newFrame(number);
     list.append(newFrame);
@@ -28,19 +28,19 @@ void Frames::appendEPoint(ePoint point)
     list.last().appendEPoint(point);
 }
 
-void Frames::appendEPoint(quint8 x, quint8 y, quint16 tot)
+void Frames::appendEPoint(quint8 x, quint8 y, int tot)
 {
     list.last().appendEPoint(x, y, tot);
 }
 
-quint16 Frames::getFrameCount()
+int Frames::getFrameCount()
 {
-    return quint16(list.length());
+    return int(list.length());
 }
 
-quint16 Frames::getClusterCount(quint16 frameNumber)
+int Frames::getClusterCount(int frameNumber)
 {
-    if(frameNumber > uint(list.length() - 1))
+    if(frameNumber > list.length() - 1)
     {
         std::cout << "error in " << Q_FUNC_INFO << __FILE__ << "line: " << __LINE__;
         exit(1);
@@ -50,19 +50,19 @@ quint16 Frames::getClusterCount(quint16 frameNumber)
     return frame.getClusterCount();
 }
 
-quint16 Frames::getClusterLenght(quint16 frameNumber, quint16 clusterNumber)
+int Frames::getClusterLenght(int frameNumber, int clusterNumber)
 {
     OneFrame frame = list.at(int(frameNumber));
     return frame.getClusterLenght(clusterNumber);
 }
 
-quint16 Frames::getEventCountInCluster(quint16 frameNumber, quint16 clusterNumber)
+int Frames::getEventCountInCluster(int frameNumber, int clusterNumber)
 {
     OneFrame frame = list.at(int(frameNumber));
     return frame.getEventCountInCluster(clusterNumber);
 }
 
-ePoint Frames::getEPoint(quint16 frameNumber, quint16 clusterNumber, quint16 eventNumber) const
+ePoint Frames::getEPoint(int frameNumber, int clusterNumber, int eventNumber) const
 {
     OneFrame frame = list.at(int(frameNumber));
     return frame.getEPoint(clusterNumber, eventNumber);
@@ -101,12 +101,12 @@ void Frames::setFile(QString path)
                 lineList << str.remove('[').remove(']');
 
             //заполняем кластер
-            quint16 i = 0;
+            int i = 0;
             foreach (QString str, lineList)
             {
                 i++;
                 QStringList point = str.split(",");
-                quint16 tot = quint16(point.at(2).toInt());
+                int tot = int(point.at(2).toInt());
 
                 appendEPoint(quint8(point.at(0).toInt()),
                              quint8(point.at(1).toInt()),
@@ -128,7 +128,7 @@ void Frames::setFile(QString path)
 //void Frames::resetTotRange()
 //{
 //    totRangeBegin   = 0;
-//    totRangeEnd     = std::numeric_limits<quint16>::max();
+//    totRangeEnd     = std::numeric_limits<int>::max();
 //}
 
 //void Frames::setMediPix(bool enable)
@@ -180,7 +180,7 @@ const QList<OneFrame> &Frames::getList()
     return list;
 }
 
-bool Frames::clusterInRange(quint16 clusterLength, quint16 clusterRangeBegin, quint16 clusterRangeEnd)
+bool Frames::clusterInRange(int clusterLength, int clusterRangeBegin, int clusterRangeEnd)
 {
     if(clusterLength >= clusterRangeBegin && clusterLength <= clusterRangeEnd)
         return true;
@@ -188,7 +188,7 @@ bool Frames::clusterInRange(quint16 clusterLength, quint16 clusterRangeBegin, qu
     return false;
 }
 
-bool Frames::totInRange(uint frameNumber, quint16 clusterNumber, quint16 totRangeBegin, quint16 totRangeEnd)
+bool Frames::totInRange(int frameNumber, int clusterNumber, int totRangeBegin, int totRangeEnd)
 {
     OneFrame frame = list.at(int(frameNumber));
     foreach (ePoint point, frame.getList().at(int(clusterNumber)))
@@ -198,8 +198,8 @@ bool Frames::totInRange(uint frameNumber, quint16 clusterNumber, quint16 totRang
     return false;
 }
 
-QList<ePoint> Frames::getListTotInRange(quint16 frameNumber, quint16 clusterNumber,
-                                        quint16 totRangeBegin, quint16 totRangeEnd) const
+QList<ePoint> Frames::getListTotInRange(int frameNumber, int clusterNumber,
+                                        int totRangeBegin, int totRangeEnd) const
 {
     OneFrame frame = list.at(int(frameNumber));
     QList<ePoint> listePoint;
@@ -212,53 +212,53 @@ QList<ePoint> Frames::getListTotInRange(quint16 frameNumber, quint16 clusterNumb
     return listePoint;
 }
 
-//quint16 Frames::getClusterRangeBegin() const
+//int Frames::getClusterRangeBegin() const
 //{
 //    return clusterRangeBegin;
 //}
 
-//void Frames::setClusterRangeBegin(const quint16 &value)
+//void Frames::setClusterRangeBegin(const int &value)
 //{
 //    clusterRangeBegin = value;
 //}
 
-//quint16 Frames::getClusterRangeEnd() const
+//int Frames::getClusterRangeEnd() const
 //{
 //    return clusterRangeEnd;
 //}
 
-//void Frames::setClusterRangeEnd(const quint16 &value)
+//void Frames::setClusterRangeEnd(const int &value)
 //{
 //    clusterRangeEnd = value;
 //}
 
-//quint16 Frames::getTotRangeBegin() const
+//int Frames::getTotRangeBegin() const
 //{
 //    return totRangeBegin;
 //}
 
-//void Frames::setTotRangeBegin(const quint16 &value)
+//void Frames::setTotRangeBegin(const int &value)
 //{
 //    totRangeBegin = value;
 //}
 
-//quint16 Frames::getTotRangeEnd() const
+//int Frames::getTotRangeEnd() const
 //{
 //    return totRangeEnd;
 //}
 
-//void Frames::setTotRangeEnd(const quint16 &value)
+//void Frames::setTotRangeEnd(const int &value)
 //{
 //    totRangeEnd = value;
 //}
 
-QVector<quint16> Frames::getClustersLenghtList()
+QVector<int> Frames::getClustersLenghtList()
 {
-    QVector<quint16> lenghtList;
-    for (quint16 frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
-        for (quint16 clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
+    QVector<int> lenghtList;
+    for (int frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
+        for (int clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
         {
-            quint16 lenght = getClusterLenght(frameNumber, clusterNumber);
+            int lenght = getClusterLenght(frameNumber, clusterNumber);
             if(!lenghtList.contains(lenght))
                 lenghtList << lenght;
         }
@@ -268,25 +268,25 @@ QVector<quint16> Frames::getClustersLenghtList()
     return lenghtList;
 }
 
-QVector<QPointF> Frames::getClusterVectorTot(quint16 clusterLenght)
+QVector<QPointF> Frames::getClusterVectorTot(int clusterLenght)
 {
     QVector<QPointF> vector;
     //key = tot, value = count
-    QMap<quint16, quint16> map;
+    QMap<int, int> map;
 
-    for (quint16 frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
-        for (quint16 clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
+    for (int frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
+        for (int clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
             if(getClusterLenght(frameNumber, clusterNumber) == clusterLenght || clusterLenght == 0)
-                for (quint16 eventNumber = 0; eventNumber < getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber)
+                for (int eventNumber = 0; eventNumber < getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber)
                 {
-                    quint16 key = getEPoint(frameNumber, clusterNumber, eventNumber).tot;
+                    int key = getEPoint(frameNumber, clusterNumber, eventNumber).tot;
                     if(map.value(key) == 0)
                         map.insert(key, 1);
                     else
                         map[key] = map.value(key) + 1;
 
                 }
-    QMapIterator<quint16, quint16> i(map);
+    QMapIterator<int, int> i(map);
 
     while (i.hasNext())
     {
@@ -301,19 +301,19 @@ QVector<QPointF> Frames::getClusterVector()
 {
     QVector<QPointF> vector;
     //key = cluster, value = count
-    QMap<quint16, quint16> map;
+    QMap<int, int> map;
 
-    for (quint16 frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
-        for (quint16 clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
+    for (int frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
+        for (int clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
         {
-            quint16 key = getClusterLenght(frameNumber, clusterNumber);
+            int key = getClusterLenght(frameNumber, clusterNumber);
             if(map.value(key) == 0)
                 map.insert(key, 1);
             else
                 map[key] = map.value(key) + 1;
         }
 
-    QMapIterator<quint16, quint16> i(map);
+    QMapIterator<int, int> i(map);
 
     while (i.hasNext())
     {
@@ -324,13 +324,13 @@ QVector<QPointF> Frames::getClusterVector()
     return vector;
 }
 
-QVector<quint16> Frames::getTotLenghtList()
+QVector<int> Frames::getTotLenghtList()
 {
-    QVector<quint16> lenghtList;
-    for (quint16 frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
-        for (quint16 clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
-            for (quint16 eventNumber = 0; eventNumber < getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber) {
-                quint16 tot = getEPoint(frameNumber, clusterNumber, eventNumber).tot;
+    QVector<int> lenghtList;
+    for (int frameNumber = 0; frameNumber < getFrameCount(); ++frameNumber)
+        for (int clusterNumber = 0; clusterNumber < getClusterCount(frameNumber); ++clusterNumber)
+            for (int eventNumber = 0; eventNumber < getEventCountInCluster(frameNumber, clusterNumber); ++eventNumber) {
+                int tot = getEPoint(frameNumber, clusterNumber, eventNumber).tot;
                 if(!lenghtList.contains(tot))
                     lenghtList << tot;
             }

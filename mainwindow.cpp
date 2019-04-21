@@ -6,7 +6,7 @@
 #include <QHeaderView>
 #include <QDebug>
 
-const QString VERSION =  "0.9.1";
+const QString VERSION =  "0.9.2";
 
 #ifdef Q_OS_Linux
     #define SPLITTER_PATH "/"
@@ -16,14 +16,16 @@ const QString VERSION =  "0.9.1";
 #endif
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent), settings(QSettings::IniFormat, QSettings::SystemScope, "WTF.org", "WTF")
 {
+    settings.setIniCodec("UTF-8");
+
     createMenu();
 
     pSplitter       = new QSplitter(Qt::Horizontal);
     pFSModel        = new QFileSystemModel;
     pTreeView       = new QTreeView;
-    pViewerWidget   = new Viewer_widget;
+    pViewerWidget   = new Viewer_widget(settings, this);
     pEventFilter    = new EventFilter(pTreeView);
     pTreeView->installEventFilter(pEventFilter);
 
@@ -54,6 +56,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setWindowTitle("WTF_Viewer " + VERSION);
 
+    QString lastPath = settings.value("Path/lastDir", 0).toString();
+    pTreeView->setCurrentIndex(pFSModel->index(lastPath));
+    pTreeView->clicked(pTreeView->currentIndex());
+
 }
 void MainWindow::createMenu()
 {
@@ -64,15 +70,20 @@ void MainWindow::createMenu()
 
     pMenuFile->addAction(QIcon(":/exit"), "Exit", QApplication::instance(), SLOT(quit()));
 
-    pMenuAbout= new QMenu("About");
-    pMenuAbout->addAction(QIcon(":/author"),"Author", this, SLOT(slotAuthor()));
-    pMenuAbout->addAction(QIcon(":/qt_logo"), "About Qt", QApplication::instance(), SLOT(aboutQt()));
+    pMenuSettings = new QMenu("Settings");
+    pMenuSettings->addAction(QIcon(":/image"), "Image", this, SLOT(slotSettingsImage()));
 
     pMenuGraph = new QMenu("Graph");
     pMenuGraph->addAction(QIcon(":/graph"), "Plot the graph", this, SLOT(slotPlotGraph()));
     pMenuGraph->setDisabled(true);
 
+    pMenuAbout= new QMenu("About");
+    pMenuAbout->addAction(QIcon(":/author"),"Author", this, SLOT(slotAuthor()));
+    pMenuAbout->addAction(QIcon(":/qt_logo"), "About Qt", QApplication::instance(), SLOT(aboutQt()));
+
+
     this->menuBar()->addMenu(pMenuFile);
+    this->menuBar()->addMenu(pMenuSettings);
     this->menuBar()->addMenu(pMenuGraph);
     this->menuBar()->addMenu(pMenuAbout);
 }
@@ -160,6 +171,11 @@ void MainWindow::slotGrapgWindowCheck(QString value)
 
     gd->selectLastWindow();
 }
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+
+}
 void MainWindow::slotAuthor()
 {
     QString text = "<h3>WTF_Viewer " + VERSION + "</h3> <br>"
@@ -237,9 +253,19 @@ void MainWindow::slotPlotGraph()
 
     delete gd;
 }
+
+void MainWindow::slotSettingsImage()
+{
+    pSettingsImage = new SettingsImage(settings, this);
+    if(pSettingsImage->exec() == QDialog::Accepted)
+        pSettingsImage->writeSettings();
+
+    delete pSettingsImage;
+    pSettingsImage = nullptr;
+
+}
 void MainWindow::slotSelectFile(const QModelIndex& index)
 {
-
     QFileInfo file(pFSModel->filePath(index));
     currentActiveFile = file.fileName();
 
@@ -254,6 +280,10 @@ void MainWindow::slotSelectFile(const QModelIndex& index)
         pMenuGraph->setEnabled(true);
     else
         pMenuGraph->setDisabled(true);
+
+//Начало тормозить  дерево - использовать QAbstractProxyModel
+    if(pFSModel->isDir(index))
+        settings.setValue("Path/lastDir", pFSModel->filePath(index) );
 }
 
 bool MainWindow::event(QEvent *event)

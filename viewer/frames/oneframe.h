@@ -6,11 +6,11 @@
 
 struct evPoint
 {
-    quint8 x = 0;
-    quint8 y = 0;
-    quint16 tot = 0;
+    int x = 0;
+    int y = 0;
+    int tot = 0;
 
-    evPoint(quint8 x, quint8 y, quint16 tot) {
+    evPoint(int x, int y, int tot) {
         this->x = x;
         this->y = y;
         this->tot = tot;
@@ -24,29 +24,29 @@ typedef QList<ePoint> cluster;
 class OneFrame
 {
 public:
-    OneFrame(uint number);
+    OneFrame(int number);
 
     void setThreshold_energy        (double value);
     void setExposure_time           (double value);
 
     void appendEPoint(ePoint point);
-    void appendEPoint(quint8 x, quint8 y, quint16 tot);
+    void appendEPoint(int x, int y, int tot);
 
     void addCluster();
-    void addEPoint(cluster &inClaster, quint8 x, quint8 y, quint16 tot);
+    void addEPoint(cluster &inClaster, int x, int y, int tot);
 
-    quint16 getClusterCount();
-    quint16 getClusterLenght(uint clusterNumber);
-    quint16 getEventCountInCluster(uint clusterNumber);
+    int getClusterCount();
+    int getClusterLenght(int clusterNumber);
+    int getEventCountInCluster(int clusterNumber);
     const QList<cluster>&
          getList();
 
-    const ePoint &getEPoint(quint16 clusterNumber, quint16 eventNumber);
+    const ePoint &getEPoint(int clusterNumber, int eventNumber);
 
     void    clear();
 
 private:
-    uint number              = 0;
+    int number              = 0;
     double threshold_energy = 0;
     double exposure_time    = 0; //спросить у Влада за параметры в скобках
 

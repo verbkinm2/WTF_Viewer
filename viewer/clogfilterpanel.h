@@ -18,20 +18,20 @@ public:
     explicit ClogFilterPanel(QWidget *parent = nullptr);
     ~ClogFilterPanel();
 
-    void    setClusterRange(QVector<quint16> vector);
-    void    setTotRange(QVector<quint16> vector);
+    void    setClusterRange(QVector<int> vector);
+    void    setTotRange(QVector<int> vector);
 
 //    void    setClusterBegin(QString value);
 //    void    setClusterEnd(QString value);
 
-    quint16 getClusterBegin() const;
-    quint16 getClusterEnd() const;
+    int getClusterBegin() const;
+    int getClusterEnd() const;
 
-    quint16 getTotBegin() const;
-    quint16 getTotEnd() const;
+    int getTotBegin() const;
+    int getTotEnd() const;
 
-//    void    setLabelClusterMaxMin(quint16 max, quint16 min);
-//    void    setLabelTotMaxMin(quint16 max, quint16 min);
+//    void    setLabelClusterMaxMin(int max, int min);
+//    void    setLabelTotMaxMin(int max, int min);
 
     bool    isClusterEnable();
     bool    isTotEnable();
@@ -64,7 +64,7 @@ public slots:
     void    slotApplyFilter         ();
 
 signals:
-//    void    signalRangeChanged      (QObject* obj, quint16 value);
+//    void    signalRangeChanged      (QObject* obj, int value);
     void    signalApplyFilter       ();
 
     void    signalPixGroupMidiPixSet(bool);

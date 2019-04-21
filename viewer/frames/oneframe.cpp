@@ -1,6 +1,6 @@
 #include "oneframe.h"
 
-OneFrame::OneFrame(uint number)
+OneFrame::OneFrame(int number)
 {
     this->number = number;
 }
@@ -20,7 +20,7 @@ void OneFrame::appendEPoint(ePoint point)
     list.last().append(point);
 }
 
-void OneFrame::appendEPoint(quint8 x, quint8 y, quint16 tot)
+void OneFrame::appendEPoint(int x, int y, int tot)
 {
     appendEPoint(ePoint(x, y, tot));
 }
@@ -33,31 +33,32 @@ void OneFrame::addCluster()
 //    return list.last();
 }
 
-void OneFrame::addEPoint(cluster &inClaster, quint8 x, quint8 y, quint16 tot)
+void OneFrame::addEPoint(cluster &inClaster, int x, int y, int tot)
 {
     inClaster.append(ePoint(x,y,tot));
 
 //    return inClaster.last();
 }
 
-quint16 OneFrame::getClusterCount()
+int OneFrame::getClusterCount()
 {
-    return quint16(list.length());
+    return int(list.length());
 }
 
-quint16 OneFrame::getClusterLenght(uint clusterNumber)
+int OneFrame::getClusterLenght(int clusterNumber)
 {
-    return  quint16(list.at(int(clusterNumber)).length());
+    return  int(list.at(int(clusterNumber)).length());
 }
 
-quint16 OneFrame::getEventCountInCluster(uint clusterNumber)
+int OneFrame::getEventCountInCluster(int clusterNumber)
 {
-    if(clusterNumber > uint(list.length() - 1)){
+    if(clusterNumber > list.length() - 1)
+    {
         qDebug() << "error in " << Q_FUNC_INFO << __FILE__ << "line: " << __LINE__;
         exit(1);
     }
 
-    return quint16(list.at(int(clusterNumber)).length());
+    return int(list.at(int(clusterNumber)).length());
 }
 
 const QList<cluster> &OneFrame::getList()
@@ -65,10 +66,10 @@ const QList<cluster> &OneFrame::getList()
     return list;
 }
 
-const ePoint &OneFrame::getEPoint(quint16 clusterNumber, quint16 eventNumber)
+const ePoint &OneFrame::getEPoint(int clusterNumber, int eventNumber)
 {
-    if(clusterNumber > uint(list.length() - 1) ||
-           eventNumber > uint(list.at(int(clusterNumber)).length()))
+    if(clusterNumber > list.length() - 1 ||
+           eventNumber > list.at(int(clusterNumber)).length())
     {
         qDebug() << "error in " << Q_FUNC_INFO << __FILE__ << "line: " << __LINE__;
         exit(1);
