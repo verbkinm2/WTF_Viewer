@@ -74,7 +74,7 @@ private slots:
 
     // QWidget interface
 protected:
-    virtual void closeEvent(QCloseEvent *event);
+    virtual void closeEvent(QCloseEvent *);
 };
 
 #endif // MAINWINDOW_H

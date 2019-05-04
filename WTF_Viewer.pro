@@ -85,5 +85,6 @@ RESOURCES += \
 
 DISTFILES +=
 
+RC_ICONS = atom.ico
 
 

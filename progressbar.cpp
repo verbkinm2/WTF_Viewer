@@ -1,13 +1,13 @@
 #include "progressbar.h"
 #include "ui_progressbar.h"
 
-ProgressBar::ProgressBar(uint max, QWidget *parent) :
+ProgressBar::ProgressBar(int max, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ProgressBar)
 {
     ui->setupUi(this);
 
-    ui->progressBar->setMaximum(int(max));
+    ui->progressBar->setMaximum(max);
     this->setWindowFlag(Qt::SplashScreen);
 }
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>606</width>
-    <height>469</height>
+    <width>540</width>
+    <height>566</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,6 +24,19 @@
        <string>Chart</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="9" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="0" column="0">
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
@@ -122,19 +135,6 @@
           </item>
          </layout>
         </widget>
-       </item>
-       <item row="7" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="6" column="0">
         <widget class="QGroupBox" name="groupBox">
@@ -238,6 +238,39 @@
          </layout>
         </widget>
        </item>
+       <item row="7" column="0">
+        <widget class="QGroupBox" name="groupBox_7">
+         <property name="title">
+          <string>Rubber band:</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QRadioButton" name="rubberModeRectangle">
+            <property name="text">
+             <string>Rectangle</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rubberModeHorizontal">
+            <property name="text">
+             <string>Horizontal</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rubberModeVertical">
+            <property name="text">
+             <string>Vertical</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
@@ -251,6 +284,75 @@
             </property>
             <property name="clearButtonEnabled">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QGroupBox" name="groupBox_8">
+         <property name="title">
+          <string>Axises range:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Y:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="axisXRangeMin">
+            <property name="minimum">
+             <double>-100000000000000004764729344.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>1000000000000000044885712678075916785549312.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>X:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QDoubleSpinBox" name="axisXRangeMax">
+            <property name="minimum">
+             <double>-1000000000000000013287555072.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>9999999999999999635896294965248.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="axisYRangeMin">
+            <property name="minimum">
+             <double>-99999999999999991433150857216.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>1000000000000000019884624838656.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QDoubleSpinBox" name="axisYRangeMax">
+            <property name="minimum">
+             <double>-100000000000000004764729344.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>1000000000000000019884624838656.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -449,6 +551,11 @@
     </widget>
    </item>
   </layout>
+  <action name="actionSetRubberMode">
+   <property name="text">
+    <string>SetRubberMode</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>tabWidget</tabstop>
@@ -482,7 +589,7 @@
      <y>338</y>
     </hint>
     <hint type="destinationlabel">
-     <x>573</x>
+     <x>507</x>
      <y>334</y>
     </hint>
    </hints>
@@ -498,7 +605,7 @@
      <y>371</y>
     </hint>
     <hint type="destinationlabel">
-     <x>573</x>
+     <x>507</x>
      <y>367</y>
     </hint>
    </hints>
@@ -514,7 +621,7 @@
      <y>215</y>
     </hint>
     <hint type="destinationlabel">
-     <x>559</x>
+     <x>498</x>
      <y>215</y>
     </hint>
    </hints>
@@ -526,11 +633,11 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>552</x>
+     <x>491</x>
      <y>207</y>
     </hint>
     <hint type="destinationlabel">
-     <x>498</x>
+     <x>464</x>
      <y>203</y>
     </hint>
    </hints>
@@ -542,11 +649,11 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>573</x>
+     <x>507</x>
      <y>334</y>
     </hint>
     <hint type="destinationlabel">
-     <x>530</x>
+     <x>464</x>
      <y>338</y>
     </hint>
    </hints>
@@ -558,17 +665,132 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>573</x>
+     <x>507</x>
      <y>367</y>
     </hint>
     <hint type="destinationlabel">
-     <x>530</x>
+     <x>464</x>
      <y>371</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rubberModeVertical</sender>
+   <signal>clicked()</signal>
+   <receiver>PanelWidget</receiver>
+   <slot>on_actionSetRubberMode_triggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>414</x>
+     <y>422</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>539</x>
+     <y>431</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rubberModeHorizontal</sender>
+   <signal>clicked()</signal>
+   <receiver>PanelWidget</receiver>
+   <slot>on_actionSetRubberMode_triggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>253</x>
+     <y>416</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>539</x>
+     <y>457</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rubberModeRectangle</sender>
+   <signal>clicked()</signal>
+   <receiver>PanelWidget</receiver>
+   <slot>on_actionSetRubberMode_triggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>63</x>
+     <y>414</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>539</x>
+     <y>486</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>axisXRangeMin</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>PanelWidget</receiver>
+   <slot>slotAxisXRangeChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>294</x>
+     <y>478</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>538</x>
+     <y>515</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>axisXRangeMax</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>PanelWidget</receiver>
+   <slot>slotAxisXRangeChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>450</x>
+     <y>475</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>535</x>
+     <y>398</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>axisYRangeMin</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>PanelWidget</receiver>
+   <slot>slotAxisYRangeChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>246</x>
+     <y>499</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>329</x>
+     <y>560</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>axisYRangeMax</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>PanelWidget</receiver>
+   <slot>slotAxisYRangeChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>400</x>
+     <y>509</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>497</x>
+     <y>561</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <signal>signalChangeTheme(QChart::ChartTheme)</signal>
+  <slot>on_actionSetRubberMode_triggered()</slot>
+  <slot>slotAxisXRangeChanged()</slot>
+  <slot>slotAxisYRangeChanged()</slot>
  </slots>
 </ui>

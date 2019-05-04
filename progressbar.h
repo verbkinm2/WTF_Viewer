@@ -12,7 +12,7 @@ class ProgressBar : public QWidget
     Q_OBJECT
 
 public:
-    ProgressBar(uint max, QWidget *parent = nullptr);
+    ProgressBar(int max, QWidget *parent = nullptr);
     ~ProgressBar();
 
 private:

@@ -30,12 +30,14 @@ bool Chart::sceneEvent(QEvent *event)
 
 bool Chart::gestureEvent(QGestureEvent *event)
 {
-    if (QGesture *gesture = event->gesture(Qt::PanGesture)) {
+    if (QGesture *gesture = event->gesture(Qt::PanGesture))
+    {
         QPanGesture *pan = static_cast<QPanGesture *>(gesture);
         QChart::scroll(-(pan->delta().x()), pan->delta().y());
     }
 
-    if (QGesture *gesture = event->gesture(Qt::PinchGesture)) {
+    if (QGesture *gesture = event->gesture(Qt::PinchGesture))
+    {
         QPinchGesture *pinch = static_cast<QPinchGesture *>(gesture);
         if (pinch->changeFlags() & QPinchGesture::ScaleFactorChanged)
             QChart::zoom(pinch->scaleFactor());

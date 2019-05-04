@@ -11,6 +11,8 @@
 
 CentralWidget::CentralWidget(QWidget *parent) : QMainWindow(parent)
 {
+    panelWidget.setParent(this);
+
     createMenu();
 
     statusBar()->insertWidget(0, &statusBarWidget);
@@ -21,7 +23,7 @@ CentralWidget::CentralWidget(QWidget *parent) : QMainWindow(parent)
     font.setPixelSize(18);
     chart.setTitleFont(QFont(font));
 
-    chart.createDefaultAxes();
+    createAxes();
 
     chart.axisX()->setTitleText("X");
     chart.axisY()->setTitleText("Y");
@@ -59,6 +61,19 @@ CentralWidget::CentralWidget(QWidget *parent) : QMainWindow(parent)
 
     connect(&panelWidget,    SIGNAL(signalSeriesDeleted()), this,
                              SLOT(slotReRange()));
+
+    connect(&panelWidget,    SIGNAL(signalRubberMode(QChartView::RubberBand)), this,
+                             SLOT(slotSetRubberMode(QChartView::RubberBand)));
+
+    connect(&panelWidget,    SIGNAL(signalAxisXRangeChanged(qreal, qreal)), this,
+                             SLOT(slotRangeXSet(qreal, qreal)));
+
+    connect(&panelWidget,    SIGNAL(signalAxisYRangeChanged(qreal, qreal)), this,
+                             SLOT(slotRangeYSet(qreal, qreal)));
+
+    connect(&panelWidget,    SIGNAL(signalSeriesTypeChange()), this,
+                             SLOT(slotSeriesTypeChanged()) );
+
 
     connect(&chartView,      SIGNAL(signalMousePosition(QPointF)), this,
                              SLOT(slotViewXYCoordinate(QPointF)));
@@ -125,7 +140,8 @@ void CentralWidget::addSeries(QVector<QPointF> pointVector, QXYSeries::SeriesTyp
     chartView.rangeY.max = maxY;
 //Что-бы правильно работало нажатие Esc <<
 
-    chart.createDefaultAxes();
+    createAxes();
+
     chart.axisX()->setRange(minX, maxX);
     chart.axisX()->setTitleText(axsisX_Title);
     chart.axisY()->setRange(minY, maxY);
@@ -155,12 +171,12 @@ QString CentralWidget::getDataXType()
 void CentralWidget::XYDefault()
 {
     lineSeriesX.setPen(QPen(QColor(Qt::black)));
-    lineSeriesX << QPointF( -(chart.maximumWidth() / 2), 0) << QPointF(chart.maximumWidth() / 2, 0);
+    lineSeriesX << QPointF(0, 0) << QPointF(chart.maximumWidth(), 0);
     lineSeriesX.setName("X");
     chart.addSeries(&lineSeriesX);
 
     lineSeriesY.setPen(QPen(QColor(Qt::black)));
-    lineSeriesY << QPointF( 0, -(chart.maximumWidth() / 2)) << QPointF(0, chart.maximumWidth() / 2);
+    lineSeriesY << QPointF(0, 0) << QPointF(0, chart.maximumWidth());
     lineSeriesY.setName("Y");
 
     chart.addSeries(&lineSeriesY);
@@ -172,7 +188,7 @@ void CentralWidget::createMenu()
     menuFile.addAction(QIcon(":/save_as"), "save as BMP", this, SLOT(slotSaveBMP()));
 
     menuView.setTitle("View");
-    menuView.addAction(QIcon(":/reset"), "Reset zoom and position", this, SLOT(slotResetZoomAndPosition()));
+    menuView.addAction(QIcon(":/reset"), "Reset zoom and position(Esp)", this, SLOT(slotResetZoomAndPosition()));
 
     this->menuBar()->addMenu(&menuFile);
     this->menuBar()->addMenu(&menuView);
@@ -216,6 +232,19 @@ double CentralWidget::findMinY(QXYSeries *series)
         if(point.y() < minY) minY = point.y();
 
     return minY;
+}
+
+void CentralWidget::createAxes()
+{
+//    disconnect(pAxisX, SIGNAL(rangeChanged(qreal, qreal)), this, SLOT(slotRangeChanged(qreal, qreal)));
+
+    chart.createDefaultAxes();
+
+    pAxisX = qobject_cast<QValueAxis*>(chart.axisX());
+    pAxisY = qobject_cast<QValueAxis*>(chart.axisY());
+
+    connect(pAxisX, SIGNAL(rangeChanged(qreal, qreal)), this, SLOT(slotRangeXChanged(qreal, qreal)));
+    connect(pAxisY, SIGNAL(rangeChanged(qreal, qreal)), this, SLOT(slotRangeYChanged(qreal, qreal)));
 }
 
 void CentralWidget::slotSetTheme(int theme)
@@ -312,7 +341,7 @@ void CentralWidget::slotReRange()
     QString axisX_Title = chart.axisX()->titleText();
     QString axisY_Title = chart.axisY()->titleText();
 
-    chart.createDefaultAxes();
+    createAxes();
     chart.axisX()->setRange(minX, maxX);
     chart.axisX()->setTitleText(axisX_Title);
     chart.axisY()->setRange(minY, maxY);
@@ -328,6 +357,42 @@ void CentralWidget::slotViewXYCoordinate(QPointF point)
 {
     statusBarWidget.setText("X: " + QString::number(point.x()) +
                             "   Y: " + QString::number(point.y()));
+}
+
+void CentralWidget::slotSetRubberMode(QChartView::RubberBand mode)
+{
+    chartView.setRubberBand(mode);
+}
+
+void CentralWidget::slotRangeXChanged(qreal min, qreal max)
+{
+    panelWidget.setRangeAxisX(min, max);
+}
+
+void CentralWidget::slotRangeYChanged(qreal min, qreal max)
+{
+    panelWidget.setRangeAxisY(min, max);
+}
+
+void CentralWidget::slotRangeXSet(qreal min, qreal max)
+{
+    pAxisX->setRange(min, max);
+}
+
+void CentralWidget::slotRangeYSet(qreal min, qreal max)
+{
+    pAxisY->setRange(min, max);
+}
+
+void CentralWidget::slotSeriesTypeChanged()
+{
+    QString axisX_Title = chart.axisX()->titleText();
+    QString axisY_Title = chart.axisY()->titleText();
+
+    createAxes();
+
+    chart.axisX()->setTitleText(axisX_Title);
+    chart.axisY()->setTitleText(axisY_Title);
 }
 
 void CentralWidget::closeEvent(QCloseEvent *event)

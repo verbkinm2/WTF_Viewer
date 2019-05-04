@@ -31,9 +31,14 @@ public:
     ~PanelWidget();
 
     void    addSeriesList(QXYSeries* series);
+    QList<QXYSeries*>* getSeriesList();
     int     getSeriesType();
 
     void    setTitle(QString title);
+
+    void    setRangeAxisX(qreal, qreal);
+    void    setRangeAxisY(qreal, qreal);
+
 
 private:
     Ui::PanelWidget *ui;
@@ -42,8 +47,6 @@ private:
     QList<CustomTableModel*> modelList;
 
     QXYSeries*      currentSeries = nullptr;
-
-//    CustomTableModel* model = nullptr;
 
     QVXYModelMapper mapper;
 
@@ -66,6 +69,14 @@ signals:
 
     void    signalSeriesDeleted();
 
+    void    signalRubberMode(QChartView::RubberBand);
+
+    void    signalAxisXRangeChanged(qreal, qreal);
+    void    signalAxisYRangeChanged(qreal, qreal);
+
+    void    signalSeriesTypeChange();
+
+
 private slots:
     void    slotSetSeriesPropery(int value);
     void    slotSetPointVisible(bool value);
@@ -78,6 +89,11 @@ private slots:
     void    slotDeleteSeries();
 
     void    slotSaveToCSV();
+
+    void    on_actionSetRubberMode_triggered();
+
+    void    slotAxisXRangeChanged   ();
+    void    slotAxisYRangeChanged   ();
 };
 
 #endif // PANELWIDGET_H

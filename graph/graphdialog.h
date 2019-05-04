@@ -16,7 +16,7 @@ public:
     explicit GraphDialog(Frames* frames, QWidget *parent = nullptr);
     ~GraphDialog();
 
-    quint16 getCurrentClusterLenght();
+    int getCurrentClusterLenght();
     QString getCurrentX();
     QString getCurrentY();
     QString getCurrentWindowGraph();

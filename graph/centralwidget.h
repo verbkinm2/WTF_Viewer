@@ -38,6 +38,8 @@ public:
     QString getTitle();
     QString getDataXType();
 
+    void           createAxes();
+
 private:
     QWidget        centralWidget;
     QLabel         statusBarWidget;
@@ -51,6 +53,9 @@ private:
     QHBoxLayout    layout;
 
     PanelWidget    panelWidget;
+
+    QValueAxis*     pAxisX = nullptr;
+    QValueAxis*     pAxisY = nullptr;
 
     double maxX = 0;
     double maxY = 0;
@@ -69,8 +74,6 @@ private:
     double findMaxY(QXYSeries* series);
     double findMinY(QXYSeries* series);
 
-signals:
-
 private slots:
     void    slotSetTheme            (int theme);
     void    slotSetLegentPosition   (int position);
@@ -88,6 +91,16 @@ private slots:
     void    slotResetZoomAndPosition();
 
     void    slotViewXYCoordinate    (QPointF point);
+
+    void    slotSetRubberMode       (QChartView::RubberBand mode);
+    void    slotRangeXChanged       (qreal, qreal);
+    void    slotRangeYChanged       (qreal, qreal);
+
+    void    slotRangeXSet           (qreal, qreal);
+    void    slotRangeYSet           (qreal, qreal);
+
+    void    slotSeriesTypeChanged   ();
+
 public slots:
 
 protected:

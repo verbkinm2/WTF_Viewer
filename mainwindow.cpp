@@ -6,7 +6,7 @@
 #include <QHeaderView>
 #include <QDebug>
 
-const QString VERSION =  "0.9.2";
+const QString VERSION =  "0.9.3";
 
 #ifdef Q_OS_Linux
     #define SPLITTER_PATH "/"
@@ -16,7 +16,7 @@ const QString VERSION =  "0.9.2";
 #endif
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), settings(QSettings::IniFormat, QSettings::SystemScope, "WTF.org", "WTF")
+    : QMainWindow(parent), settings(QSettings::IniFormat, QSettings::UserScope, "WTF.org", "WTF")
 {
     settings.setIniCodec("UTF-8");
 
@@ -172,7 +172,7 @@ void MainWindow::slotGrapgWindowCheck(QString value)
     gd->selectLastWindow();
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent*)
 {
 
 }
@@ -206,7 +206,7 @@ void MainWindow::slotPlotGraph()
 
     if(gd->exec() == QDialog::Accepted)
     {
-        QApplication::setOverrideCursor(Qt::WaitCursor);
+//        QApplication::setOverrideCursor(Qt::WaitCursor);
 
         QVector<QPointF> vector;
         if(gd->getCurrentX() == "Tots")
@@ -248,7 +248,8 @@ void MainWindow::slotPlotGraph()
             graphWindow->addSeries(vector, legendText, gd->getCurrentX(), "Count");
             graphWindow->show();
         }
-        QApplication::restoreOverrideCursor();
+
+//        QApplication::restoreOverrideCursor();
     }
 
     delete gd;

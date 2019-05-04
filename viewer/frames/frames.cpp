@@ -87,7 +87,7 @@ void Frames::setFile(QString path)
         if(line.startsWith("Frame"))
         {
             lineSplit = line.split(' ');
-            addFrame(uint(lineSplit.at(1).toInt()));
+            addFrame(lineSplit.at(1).toInt());
             emit signalFrameCreated(countLine);
 
         }

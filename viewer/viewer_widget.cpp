@@ -118,7 +118,7 @@ QImage Viewer_widget::getImageFromClogFile(QString fileName)
 {
     QFile file(fileName);
     file.open(QFile::ReadOnly);
-    uint lines = 0;
+    int lines = 0;
 
     while (!file.atEnd())
     {
@@ -356,7 +356,7 @@ void Viewer_widget::applyClogFilter(QImage& image)
             QColor color(value, value, value);
             image.setPixelColor(x, y, color);
         }
-    //цвет пикселей, которым применилась маска
+    //цвет пикселей, к которым применилась маска
     imageSettingsForImage(image);
 }
 //для меньшего кол-ва строк исполбзуем эту функцию
@@ -367,9 +367,9 @@ void Viewer_widget::applyClogFilterAdditionalFunction(const ePoint &point)
         return;
     //Выбор режима - MediPix or TimePix
     if(ui->clogFilterPanel->isMediPix())
-        arrayOrigin[point.x][point.y] += 1;
+        arrayOrigin[point.x][point.y] = arrayOrigin[point.x][point.y] + 1;
     else
-        arrayOrigin[point.x][point.y] += point.tot;
+        arrayOrigin[point.x][point.y] = arrayOrigin[point.x][point.y] + point.tot;
 }
 
 void Viewer_widget::imageSettingsForImage(QImage &image)
@@ -480,7 +480,7 @@ void Viewer_widget::slotCreateRectItem(QGraphicsRectItem * item)
 
 void Viewer_widget::slotApplyClogFilter()
 {
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+//    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     QImage image(column, row, QImage::Format_ARGB32_Premultiplied);
     image.fill(Qt::white);
@@ -489,7 +489,7 @@ void Viewer_widget::slotApplyClogFilter()
 
     setImage(image);
 
-    QApplication::restoreOverrideCursor();
+//    QApplication::restoreOverrideCursor();
 }
 
 void Viewer_widget::slotRepaint()
@@ -534,11 +534,11 @@ void Viewer_widget::slotDrawPoint(QPointF point)
 }
 void Viewer_widget::slotViewSelectionPos(QRect rect)
 {
-    qint16 x = qint16(rect.x());
-    qint16 y = qint16(rect.y());
+    int x = rect.x();
+    int y = rect.y();
 
-    qint16 width = qint16(rect.width());
-    qint16 height = qint16(rect.height());
+    int width = rect.width();
+    int height = rect.height();
 
     if(height < 0 && width < 0)
     {
@@ -762,8 +762,8 @@ void Viewer_widget::slotCut()
 
     //Заполнение временного массива данными из выделенной области
     int value = 0;
-    for (qint16 x = qint16(ui->x_selection->value()), tmpX = 0; tmpX < column; ++x, ++tmpX)
-        for (qint16 y = qint16(ui->y_selection->value()), tmpY = 0; tmpY < row; ++y, ++tmpY) {
+    for (int x = int(ui->x_selection->value()), tmpX = 0; tmpX < column; ++x, ++tmpX)
+        for (int y = int(ui->y_selection->value()), tmpY = 0; tmpY < row; ++y, ++tmpY) {
             if( (x < 0) || (x >= this->column) || (y < 0) || (y >= this->row) )
                 value = 0;
             else

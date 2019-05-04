@@ -1,6 +1,8 @@
 #include "panelwidget.h"
 #include "ui_panelwidget.h"
 
+#include "centralwidget.h"
+
 #include <QChart>
 #include <QXYSeries>
 #include <QColorDialog>
@@ -81,6 +83,9 @@ PanelWidget::~PanelWidget()
 
     foreach (QXYSeries* series, seriesList)
         delete series;
+
+    foreach (CustomTableModel* model, modelList)
+        delete model;
 }
 
 void PanelWidget::addSeriesList(QXYSeries *series)
@@ -91,6 +96,11 @@ void PanelWidget::addSeriesList(QXYSeries *series)
     modelList.append(model);
 
     ui->seriesList->addItem(series->name());
+}
+
+QList<QXYSeries *>* PanelWidget::getSeriesList()
+{
+    return &seriesList;
 }
 
 void PanelWidget::createTableData()
@@ -268,6 +278,11 @@ void PanelWidget::slotSetSeriesType(int value)
 
     (static_cast<QValueAxis*>(chart->axisX()))->setTickCount(ui->tickCountX->value());
     (static_cast<QValueAxis*>(chart->axisY()))->setTickCount(ui->tickCountY->value());
+
+    chart->axisX()->setRange(ui->axisXRangeMin->value(), ui->axisXRangeMax->value());
+    chart->axisY()->setRange(ui->axisYRangeMin->value(), ui->axisYRangeMax->value());
+
+    emit signalSeriesTypeChange();
 }
 
 void PanelWidget::slotHideSeries(bool value)
@@ -340,4 +355,38 @@ void PanelWidget::slotSaveToCSV()
 
         file.close();
     }
+}
+
+void PanelWidget::on_actionSetRubberMode_triggered()
+{
+    if(sender()->objectName() == "rubberModeRectangle")
+        emit signalRubberMode(QtCharts::QChartView::RectangleRubberBand);
+
+    else if (sender()->objectName() == "rubberModeHorizontal")
+        emit signalRubberMode(QtCharts::QChartView::HorizontalRubberBand);
+
+    else if (sender()->objectName() == "rubberModeVertical")
+        emit signalRubberMode(QtCharts::QChartView::VerticalRubberBand);
+}
+
+void PanelWidget::slotAxisXRangeChanged()
+{
+    emit signalAxisXRangeChanged(ui->axisXRangeMin->value(), ui->axisXRangeMax->value());
+}
+
+void PanelWidget::slotAxisYRangeChanged()
+{
+    emit signalAxisYRangeChanged(ui->axisYRangeMin->value(), ui->axisYRangeMax->value());
+}
+
+void PanelWidget::setRangeAxisX(qreal min, qreal max)
+{
+    ui->axisXRangeMin->setValue(min);
+    ui->axisXRangeMax->setValue(max);
+}
+
+void PanelWidget::setRangeAxisY(qreal min, qreal max)
+{
+    ui->axisYRangeMin->setValue(min);
+    ui->axisYRangeMax->setValue(max);
 }

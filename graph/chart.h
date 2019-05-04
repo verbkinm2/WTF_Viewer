@@ -1,6 +1,7 @@
 #ifndef CHART_H
 #define CHART_H
 
+#include <QValueAxis>
 #include <QtCharts/QChart>
 
 QT_BEGIN_NAMESPACE
@@ -22,8 +23,6 @@ protected:
 
 private:
     bool gestureEvent(QGestureEvent *event);
-
-private:
 
 };
 
