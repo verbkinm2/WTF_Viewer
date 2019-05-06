@@ -5,7 +5,7 @@ ListData::ListData(QString fileName)
 {
      this->checkFile(fileName);
 }
-QList<quint16> ListData::checkFile(QString fileName)
+QList<int> ListData::checkFile(QString fileName)
 {
     QFile file(fileName);
 
@@ -27,12 +27,11 @@ QList<quint16> ListData::checkFile(QString fileName)
             QStringList splitString = QString(file.readLine()).remove("\r\n").split(" ");
             int countInLine = splitString.length();
 
-            //максимальное число элемента - 65535, все что больше будет = 0, отрицательные числа будут равны: 65536 плюс отрицательное число
             foreach (QString element, splitString)
-                list.append(element.toUShort());
+                list.append(int(element.toDouble()));
 
             //если в текущей строке элементов меньше чем в максимальной строке - добавляем нули
-            while (countInLine != maxCountElement)
+            while (int(countInLine )!= maxCountElement)
             {
                 list.append(0);
                 countInLine++;

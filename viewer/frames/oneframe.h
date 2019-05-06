@@ -10,12 +10,11 @@ struct evPoint
     int y = 0;
     int tot = 0;
 
-    evPoint(int x, int y, int tot) {
+    evPoint(const int& x, const int& y, const int& tot) {
         this->x = x;
         this->y = y;
         this->tot = tot;
     }
-
 };
 
 typedef struct evPoint ePoint;
@@ -26,22 +25,21 @@ class OneFrame
 public:
     OneFrame(int number);
 
-    void setThreshold_energy        (double value);
-    void setExposure_time           (double value);
+    void setThreshold_energy        (const double& value);
+    void setExposure_time           (const double& value);
 
-    void appendEPoint(ePoint point);
-    void appendEPoint(int x, int y, int tot);
+    void appendEPoint(const ePoint &point);
+    void appendEPoint(const int &x, const int &y, const int &tot);
 
     void addCluster();
-    void addEPoint(cluster &inClaster, int x, int y, int tot);
+    void addEPoint(cluster& inClaster, const int& x, const int& y, const int& tot);
 
-    int getClusterCount();
-    int getClusterLenght(int clusterNumber);
-    int getEventCountInCluster(int clusterNumber);
-    const QList<cluster>&
-         getList();
+    int getClusterCount() const;
+    int getClusterLenght(const int& clusterNumber) const;
+    int getEventCountInCluster(const int& clusterNumber) const;
+    const QList<cluster>& getList() const;
 
-    const ePoint &getEPoint(int clusterNumber, int eventNumber);
+    const ePoint &getEPoint(const int& clusterNumber, const int& eventNumber) const;
 
     void    clear();
 
@@ -51,7 +49,6 @@ private:
     double exposure_time    = 0; //спросить у Влада за параметры в скобках
 
     QList<cluster> list;
-
 };
 
 #endif // ONEFRAME_H

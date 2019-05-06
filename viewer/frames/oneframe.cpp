@@ -5,24 +5,24 @@ OneFrame::OneFrame(int number)
     this->number = number;
 }
 
-void OneFrame::setThreshold_energy(double value)
+void OneFrame::setThreshold_energy(const double &value)
 {
     threshold_energy = value;
 }
 
-void OneFrame::setExposure_time(double value)
+void OneFrame::setExposure_time(const double& value)
 {
     exposure_time = value;
 }
 
-void OneFrame::appendEPoint(ePoint point)
+void OneFrame::appendEPoint(const ePoint& point)
 {
     list.last().append(point);
 }
 
-void OneFrame::appendEPoint(int x, int y, int tot)
+void OneFrame::appendEPoint(const int& x, const int& y, const int& tot)
 {
-    appendEPoint(ePoint(x, y, tot));
+    appendEPoint({x, y, tot});
 }
 
 void OneFrame::addCluster()
@@ -33,24 +33,21 @@ void OneFrame::addCluster()
 //    return list.last();
 }
 
-void OneFrame::addEPoint(cluster &inClaster, int x, int y, int tot)
+void OneFrame::addEPoint(cluster& inClaster, const int &x, const int &y, const int &tot)
 {
-    inClaster.append(ePoint(x,y,tot));
-
-//    return inClaster.last();
+    inClaster.append({x,y,tot});
 }
-
-int OneFrame::getClusterCount()
+int OneFrame::getClusterCount() const
 {
     return int(list.length());
 }
 
-int OneFrame::getClusterLenght(int clusterNumber)
+int OneFrame::getClusterLenght(const int& clusterNumber) const
 {
     return  int(list.at(int(clusterNumber)).length());
 }
 
-int OneFrame::getEventCountInCluster(int clusterNumber)
+int OneFrame::getEventCountInCluster(const int& clusterNumber) const
 {
     if(clusterNumber > list.length() - 1)
     {
@@ -61,12 +58,12 @@ int OneFrame::getEventCountInCluster(int clusterNumber)
     return int(list.at(int(clusterNumber)).length());
 }
 
-const QList<cluster> &OneFrame::getList()
+const QList<cluster> &OneFrame::getList() const
 {
     return list;
 }
 
-const ePoint &OneFrame::getEPoint(int clusterNumber, int eventNumber)
+const ePoint& OneFrame::getEPoint(const int &clusterNumber, const int &eventNumber) const
 {
     if(clusterNumber > list.length() - 1 ||
            eventNumber > list.at(int(clusterNumber)).length())
@@ -75,7 +72,7 @@ const ePoint &OneFrame::getEPoint(int clusterNumber, int eventNumber)
         exit(1);
     }
 
-    return list.at(int(clusterNumber)).at(int(eventNumber));
+    return list.at(clusterNumber).at(eventNumber);
 }
 
 void OneFrame::clear()

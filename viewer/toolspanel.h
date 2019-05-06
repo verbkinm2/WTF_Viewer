@@ -28,13 +28,13 @@ public:
     void finishSelection        ();
 
     QColor  getPenColor         ();
-    quint16 getPenValue         ();
+    int     getPenValue         ();
 
 private:
     Ui::ToolsPanel *ui;
 
     QColor  m_color;
-    quint16 m_value;
+    int     m_value;
 
 private slots:
     void slotSetColor           ();

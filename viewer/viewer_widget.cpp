@@ -14,6 +14,7 @@
 #include <QFileInfo>
 
 #include <QDebug>
+#include <QTime>
 
 
 Viewer_widget::Viewer_widget(QSettings &setting, QWidget *parent) :
@@ -116,20 +117,21 @@ QImage Viewer_widget::getImageFromTxtFile(QString fileName)
 
 QImage Viewer_widget::getImageFromClogFile(QString fileName)
 {
-    QFile file(fileName);
-    file.open(QFile::ReadOnly);
-    int lines = 0;
+//    QFile file(fileName);
+//    file.open(QFile::ReadOnly);
+//    int lines = 0;
 
-    while (!file.atEnd())
-    {
-        file.readLine();
-        lines++;
-    }
-    file.close();
+//    while (!file.atEnd())
+//    {
+//        file.readLine();
+//        lines++;
+//    }
+//    file.close();
 
-    ProgressBar progressBar(lines);
+//    ProgressBar progressBar(lines);
+    ProgressBar progressBar(0);
     connect(&frames, SIGNAL(signalFramesCreated()), &progressBar, SLOT(close()));
-    connect(&frames, SIGNAL(signalFrameCreated(int)), &progressBar, SLOT(slotSetValue(int)));
+//    connect(&frames, SIGNAL(signalFrameCreated(int)), &progressBar, SLOT(slotSetValue(int)));
     progressBar.show();
 
     frames.setFile(fileName);
@@ -507,7 +509,7 @@ void Viewer_widget::slotRepaint()
             QColor color(value, value, value);
             imageOrigin.setPixelColor(x, y, color);
         }
-    itemForeground->setPixmap(QPixmap::fromImage(imageOrigin));
+    slotInversionCheckBox(ui->inversion->checkState());
 }
 
 void Viewer_widget::slotViewSelectionMovePos(QPoint point)
@@ -572,6 +574,7 @@ void Viewer_widget::slotViewSelectionPos(QRect rect)
 void Viewer_widget::slotFinishSelection()
 {
     ui->graphicsView->unsetCursor();
+    ui->graphicsView_Origin->unsetCursor();
     setReadOnlyDataPanelSelection(false);
     ui->edit_panel->finishSelection();
     ui->edit_panel->buttonCutDisable(false);
@@ -702,20 +705,26 @@ void Viewer_widget::slotSelectionFrame(bool value)
             itemRect = nullptr;
         }
         ui->graphicsView->setCursor(QCursor(Qt::CrossCursor));
+        ui->graphicsView_Origin->setCursor(QCursor(Qt::CrossCursor));
     }
     if(!value && itemRect == nullptr)
     {
         ui->graphicsView->unsetCursor();
+        ui->graphicsView_Origin->unsetCursor();
         setEnableDataPanelSelection(false);
     }
 }
 
 void Viewer_widget::slotPen(bool value)
 {
-    if(value)
+    if(value){
        ui->graphicsView->setCursor(QCursor(QPixmap(":/pen").scaled(24,24, Qt::KeepAspectRatio, Qt::SmoothTransformation), X_HOT ,Y_HOT));
-    else
+       ui->graphicsView_Origin->setCursor(QCursor(QPixmap(":/pen").scaled(24,24, Qt::KeepAspectRatio, Qt::SmoothTransformation), X_HOT ,Y_HOT));
+    }
+    else{
        ui->graphicsView->unsetCursor();
+       ui->graphicsView_Origin->unsetCursor();
+    }
 }
 void Viewer_widget::slotInversionCheckBox(int state)
 {
@@ -829,7 +838,7 @@ void Viewer_widget::slotRotate()
         ui->angle->setValue(ui->angle->value() - 90);
     }
     else
-    {        
+    {
         itemForeground->setTransformOriginPoint(column / 2, row / 2);
 //        itemForeground->setRotation(ui->angle->value());
         QTransform transform;

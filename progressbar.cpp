@@ -9,6 +9,8 @@ ProgressBar::ProgressBar(int max, QWidget *parent) :
 
     ui->progressBar->setMaximum(max);
     this->setWindowFlag(Qt::SplashScreen);
+
+    ui->progressBar->hide();
 }
 
 ProgressBar::~ProgressBar()

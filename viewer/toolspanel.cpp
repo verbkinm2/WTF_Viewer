@@ -71,9 +71,9 @@ QColor ToolsPanel::getPenColor()
     return m_color;
 }
 
-quint16 ToolsPanel::getPenValue()
+int ToolsPanel::getPenValue()
 {
-    return quint16(ui->pen_value_Spin->value());
+    return ui->pen_value_Spin->value();
 }
 
 void ToolsPanel::slotSetColor()
@@ -105,5 +105,5 @@ void ToolsPanel::slotPenToggle(bool value)
 
 void ToolsPanel::slotPenValueChanged(int value)
 {
-    m_value = quint16(value);
+    m_value = value;
 }
