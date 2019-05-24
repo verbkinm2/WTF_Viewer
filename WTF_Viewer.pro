@@ -39,6 +39,7 @@ SOURCES += \
     viewer/frames/frames.cpp \
     viewer/frames/oneframe.cpp \
     viewer/clogfilterpanel.cpp \
+    viewer/masksettings.cpp \
     viewer/toolspanel.cpp \
     viewer/viewer_widget.cpp \
     main.cpp \
@@ -60,6 +61,7 @@ HEADERS += \
     viewer/frames/frames.h \
     viewer/frames/oneframe.h \
     viewer/clogfilterpanel.h \
+    viewer/masksettings.h \
     viewer/toolspanel.h \
     viewer/viewer_widget.h \
     mainwindow.h \
@@ -76,6 +78,7 @@ FORMS += \
     graph/panelwidget.ui \
     settings/settingsimage.ui \
     viewer/clogfilterpanel.ui \
+    viewer/masksettings.ui \
     viewer/toolspanel.ui \
     viewer/viewer_widget.ui \
     progressbar.ui
