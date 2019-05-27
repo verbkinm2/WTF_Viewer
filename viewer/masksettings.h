@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#define BINNING_MAX_SIZE 15
+
 namespace Ui {
 class MaskSettings;
 }
@@ -15,9 +17,6 @@ public:
     explicit MaskSettings(QWidget *parent = nullptr);
     ~MaskSettings();
 
-    enum    TYPE_LIST {MASK, RESTORE_FUNCTION};
-
-    int     getType() const;
     int     getRank() const;
     int     getTransparency() const;
 
@@ -25,13 +24,21 @@ public:
 private:
     Ui::MaskSettings *ui;
 
+    int** arrayBin = nullptr;
+
+    enum TAB_NAME{MASK, CONVOLUTION, BACKPROJECTION};
+
 private slots:
     void    slotGenerate();
     void    slotOpenTXT();
     void    slotSaveTXT();
+    void    slotBinningChanged(int);
+
+    void    slotTableShow();
 
 signals:
     void    signalGenerated();
+    void    signalOpenTXT(QString);
 };
 
 #endif // MASKSETTINGS_H

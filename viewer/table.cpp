@@ -1,0 +1,77 @@
+#include "table.h"
+#include "ui_table.h"
+#include <QSpinBox>
+
+Table::Table(int size, int **array, QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::Table)
+{
+    ui->setupUi(this);
+    arrayBin = array;
+    this->setWindowFlag(Qt::Drawer);
+
+    ui->tableWidget->setRowCount(size);
+    ui->tableWidget->setColumnCount(size);
+
+    for (int row = 0; row < ui->tableWidget->rowCount(); ++row) {
+        for (int column = 0; column < ui->tableWidget->columnCount(); ++column) {
+            QSpinBox* spinbox = new QSpinBox;
+            spinbox->setButtonSymbols(QAbstractSpinBox::NoButtons);
+            spinbox->setAlignment(Qt::AlignHCenter);
+            spinbox->setValue(array[row][column]);
+            ui->tableWidget->setCellWidget(row, column, spinbox);
+            if(row % 2 == 0)
+                spinbox->setStyleSheet("background-color: #c8c8c8;");
+        }
+    }
+
+    ui->tableWidget->resizeRowsToContents();
+    ui->tableWidget->resizeColumnsToContents();
+
+    // для плавной прокрутки таблицы
+    ui->tableWidget->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    ui->tableWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    ui->tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
+
+    this->resize(640, 480);
+}
+
+Table::~Table()
+{
+    for (int row = 0; row < ui->tableWidget->rowCount(); ++row)
+        for (int column = 0; column < ui->tableWidget->columnCount(); ++column)
+            delete ui->tableWidget->cellWidget(row, column);
+
+    delete ui;
+}
+
+void Table::saveData()
+{
+    for (int row = 0; row < ui->tableWidget->rowCount(); ++row)
+        for (int column = 0; column < ui->tableWidget->columnCount(); ++column)
+            arrayBin[row][column] = qobject_cast<QSpinBox*>(ui->tableWidget->cellWidget(row, column))->value();
+}
+
+void Table::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+
+    // растягиваем ширину столбцов до предела, если ширина всех столбцов меньше ширины тыблицы
+    int widthColumns_TableLessonData = 0;
+    for (int column = 0; column < ui->tableWidget->columnCount(); ++column)
+        widthColumns_TableLessonData += ui->tableWidget->columnWidth(column);
+    if(widthColumns_TableLessonData < ui->tableWidget->width()){
+        for (int column = 0; column < ui->tableWidget->columnCount(); ++column){
+            ui->tableWidget->horizontalHeader()->setSectionResizeMode(column, QHeaderView::Stretch);
+        }
+    }
+    // растягиваем высоту строк до предела, если высота всех строк меньше высоты тыблицы
+    int heightRows_TableLessonData = 0;
+    for (int row = 0; row < ui->tableWidget->rowCount(); ++row)
+        heightRows_TableLessonData += ui->tableWidget->rowHeight(row);
+    if(heightRows_TableLessonData < ui->tableWidget->height()){
+        for (int row = 0; row < ui->tableWidget->rowCount(); ++row){
+            ui->tableWidget->verticalHeader()->setSectionResizeMode(row, QHeaderView::Stretch);
+        }
+    }
+}

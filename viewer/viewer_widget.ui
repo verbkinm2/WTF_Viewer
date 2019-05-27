@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="usesScrollButtons">
       <bool>true</bool>
@@ -771,17 +771,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QGraphicsView" name="graphicsView_Mask">
-            <property name="backgroundBrush">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>200</red>
-               <green>200</green>
-               <blue>200</blue>
-              </color>
-             </brush>
-            </property>
-           </widget>
+           <widget class="Mask_Viewer" name="mask_viewer" native="true"/>
           </item>
          </layout>
         </widget>
@@ -809,7 +799,7 @@
         </widget>
        </item>
        <item row="1" column="2">
-        <widget class="MaskSettings" name="widget" native="true"/>
+        <widget class="MaskSettings" name="mask_settings" native="true"/>
        </item>
       </layout>
      </widget>
@@ -836,6 +826,12 @@
    <header>../WTF_Viewer/viewer/masksettings.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>Mask_Viewer</class>
+   <extends>QWidget</extends>
+   <header>../WTF_Viewer/viewer/mask_viewer.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
@@ -856,7 +852,6 @@
   <tabstop>scaled_minus</tabstop>
   <tabstop>graphicsView_Origin</tabstop>
   <tabstop>graphicsView_Result</tabstop>
-  <tabstop>graphicsView_Mask</tabstop>
  </tabstops>
  <resources>
   <include location="../img.qrc"/>

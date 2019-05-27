@@ -16,5 +16,6 @@
         <file alias="graph">img/graph.png</file>
         <file alias="trash">img/trash.png</file>
         <file alias="image">img/image.png</file>
+        <file alias="table">img/table.png</file>
     </qresource>
 </RCC>

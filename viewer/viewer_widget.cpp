@@ -85,6 +85,8 @@ Viewer_widget::Viewer_widget(QSettings &setting, QWidget *parent) :
 
     //при первом запуске - вывести на экран надпись и отключить всё не нужное
     incorrectFile();
+
+    connect(ui->mask_settings, SIGNAL(signalOpenTXT(QString)), ui->mask_viewer, SLOT(slotOpenTXT(QString)));
 }
 void Viewer_widget::selectFile()
 {
