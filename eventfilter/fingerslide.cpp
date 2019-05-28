@@ -1,5 +1,5 @@
 #include "fingerslide.h"
-#include "../viewer/viewer_widget.h"
+#include "../viewer/viewer.h"
 
 #include <QDebug>
 #include <QObject>
@@ -43,8 +43,8 @@ bool FingerSlide::eventFilterScene(QObject* object, QEvent* event)
             rectItem->setRect(QRectF(point, QSize(int(x - point.x()), int(y - point.y()))) );
             emit siganlRect(rectItem->rect().toRect());
         }
-        if(graphView->cursor().hotSpot().x() == Viewer_widget::X_HOT &&
-           graphView->cursor().hotSpot().y() == Viewer_widget::Y_HOT &&
+        if(graphView->cursor().hotSpot().x() == Viewer::X_HOT &&
+           graphView->cursor().hotSpot().y() == Viewer::Y_HOT &&
            QApplication::mouseButtons() == Qt::LeftButton)
         {
             emit signalDrawPoint(mevent->scenePos());
@@ -58,8 +58,8 @@ bool FingerSlide::eventFilterScene(QObject* object, QEvent* event)
 
         //не перетаскивать рамку выделения, если мы рисуем карандашом
         if(scene->items().count() > 2 &&
-            graphView->cursor().hotSpot().x() == Viewer_widget::X_HOT &&
-            graphView->cursor().hotSpot().y() == Viewer_widget::Y_HOT)
+            graphView->cursor().hotSpot().x() == Viewer::X_HOT &&
+            graphView->cursor().hotSpot().y() == Viewer::Y_HOT)
         {
            QGraphicsRectItem* rectItem = static_cast<QGraphicsRectItem*>(scene->items().at(0));
            rectItem->setFlags(nullptr);
@@ -69,12 +69,14 @@ bool FingerSlide::eventFilterScene(QObject* object, QEvent* event)
         {
             QGraphicsRectItem* rectItem = scene->addRect(QRectF(QPointF(0,0), QSize(0,0)), \
                                                              QPen(QBrush(QColor(Qt::red)), 0));
-            rectItem->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+//            rectItem->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+//            rectItem->setFlag(QGraphicsItem::ItemIsMovable, false);
+//            rectItem->setFlag(QGraphicsItem::ItemIsSelectable, false);
             rectItem->setZValue(2);
             emit signalCreateRectItem(rectItem);
         }
-        if(graphView->cursor().hotSpot().x() == Viewer_widget::X_HOT &&
-           graphView->cursor().hotSpot().y() == Viewer_widget::Y_HOT)
+        if(graphView->cursor().hotSpot().x() == Viewer::X_HOT &&
+           graphView->cursor().hotSpot().y() == Viewer::Y_HOT)
         {
             QGraphicsSceneMouseEvent* mevent = static_cast<QGraphicsSceneMouseEvent*>(event);
             emit signalDrawPoint(mevent->scenePos());
@@ -123,8 +125,8 @@ bool FingerSlide::eventFilterScene(QObject* object, QEvent* event)
             rectItem->setPos(int(x), int(y) );
 
             //если не идет процесс рисования
-            if(graphView->cursor().hotSpot().x() != Viewer_widget::X_HOT &&
-               graphView->cursor().hotSpot().y() != Viewer_widget::Y_HOT)
+            if(graphView->cursor().hotSpot().x() != Viewer::X_HOT &&
+               graphView->cursor().hotSpot().y() != Viewer::Y_HOT)
                 emit signalRelease();
         }
     }
@@ -169,8 +171,8 @@ bool FingerSlide::eventFilterViewport(QObject* object, QEvent* event)
         if(QApplication::mouseButtons() == Qt::LeftButton && \
                 (graphView->scene()->selectedItems().length() < 2 ) && \
                 graphView->cursor() != Qt::CrossCursor &&
-                graphView->cursor().hotSpot().x() != Viewer_widget::X_HOT &&
-                graphView->cursor().hotSpot().y() != Viewer_widget::Y_HOT)
+                graphView->cursor().hotSpot().x() != Viewer::X_HOT &&
+                graphView->cursor().hotSpot().y() != Viewer::Y_HOT)
         {
             slide(object, event);
         }

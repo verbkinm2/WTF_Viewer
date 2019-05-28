@@ -66,7 +66,7 @@ void MaskSettings::slotOpenTXT()
                                                "TXT (*.txt)");
     if(!file.isNull()){
         //ловится в классе viewer_widget
-        qDebug() << "emit";
+//        qDebug() << "emit";
         emit signalOpenTXT(file);
     }
 }

@@ -43,6 +43,7 @@ SOURCES += \
     viewer/masksettings.cpp \
     viewer/table.cpp \
     viewer/toolspanel.cpp \
+    viewer/viewer.cpp \
     viewer/viewer_widget.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -67,6 +68,7 @@ HEADERS += \
     viewer/masksettings.h \
     viewer/table.h \
     viewer/toolspanel.h \
+    viewer/viewer.h \
     viewer/viewer_widget.h \
     mainwindow.h \
     progressbar.h
@@ -86,6 +88,7 @@ FORMS += \
     viewer/masksettings.ui \
     viewer/table.ui \
     viewer/toolspanel.ui \
+    viewer/viewer.ui \
     viewer/viewer_widget.ui \
     progressbar.ui
 
