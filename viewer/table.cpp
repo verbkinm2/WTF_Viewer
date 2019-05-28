@@ -1,8 +1,8 @@
 #include "table.h"
 #include "ui_table.h"
-#include <QSpinBox>
+#include <QDoubleSpinBox>
 
-Table::Table(int size, int **array, QWidget *parent) :
+Table::Table(int size, double **array, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Table)
 {
@@ -15,7 +15,9 @@ Table::Table(int size, int **array, QWidget *parent) :
 
     for (int row = 0; row < ui->tableWidget->rowCount(); ++row) {
         for (int column = 0; column < ui->tableWidget->columnCount(); ++column) {
-            QSpinBox* spinbox = new QSpinBox;
+            QDoubleSpinBox* spinbox = new QDoubleSpinBox;
+            spinbox->setRange(-256.00, 256.00);
+            spinbox->setSingleStep(0.01);
             spinbox->setButtonSymbols(QAbstractSpinBox::NoButtons);
             spinbox->setAlignment(Qt::AlignHCenter);
             spinbox->setValue(array[row][column]);
@@ -49,7 +51,7 @@ void Table::saveData()
 {
     for (int row = 0; row < ui->tableWidget->rowCount(); ++row)
         for (int column = 0; column < ui->tableWidget->columnCount(); ++column)
-            arrayBin[row][column] = qobject_cast<QSpinBox*>(ui->tableWidget->cellWidget(row, column))->value();
+            arrayBin[row][column] = qobject_cast<QDoubleSpinBox*>(ui->tableWidget->cellWidget(row, column))->value();
 }
 
 void Table::resizeEvent(QResizeEvent *event)

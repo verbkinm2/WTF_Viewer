@@ -10,13 +10,13 @@ MaskSettings::MaskSettings(QWidget *parent) :
     ui(new Ui::MaskSettings)
 {
     //выделение памяти
-    arrayBin = new int* [BINNING_MAX_SIZE];
+    arrayBin = new double* [BINNING_MAX_SIZE];
     for (int i = 0; i < BINNING_MAX_SIZE ; ++i)
-        arrayBin[i] = new int[BINNING_MAX_SIZE ];
+        arrayBin[i] = new double[BINNING_MAX_SIZE ];
 
     for (int row = 0; row < BINNING_MAX_SIZE; ++row)
         for (int column = 0; column < BINNING_MAX_SIZE; ++column)
-            arrayBin[row][column]= 1;
+            arrayBin[row][column]= 1.00;
 
     ui->setupUi(this);
 
@@ -66,7 +66,6 @@ void MaskSettings::slotOpenTXT()
                                                "TXT (*.txt)");
     if(!file.isNull()){
         //ловится в классе viewer_widget
-//        qDebug() << "emit";
         emit signalOpenTXT(file);
     }
 }

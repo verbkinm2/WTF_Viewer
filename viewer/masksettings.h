@@ -24,7 +24,7 @@ public:
 private:
     Ui::MaskSettings *ui;
 
-    int** arrayBin = nullptr;
+    double** arrayBin = nullptr;
 
     enum TAB_NAME{MASK, CONVOLUTION, BACKPROJECTION};
 

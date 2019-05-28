@@ -1,5 +1,6 @@
 #include "checkfile.h"
 #include <QFile>
+#include <QDebug>
 
 ListData::ListData(QString fileName)
 {
@@ -9,8 +10,21 @@ QList<int> ListData::checkFile(QString fileName)
 {
     QFile file(fileName);
 
-    if(file.open(QIODevice::ReadOnly) )
+    if(file.open(QIODevice::ReadWrite) )
     {
+        char c;
+        //замена символов табуляции, если они есть, на пробелы
+        while (!file.atEnd()){
+            file.getChar(&c);
+            if(c == '\t'){
+                qint64 pos = file.pos();
+                file.seek(--pos);
+                file.putChar(' ');
+            }
+        }
+
+        file.seek(0);
+
         //переменная для наибольшего кол-ва элементов в строке
         int maxCountElement = 0;
         int countString  = 0;

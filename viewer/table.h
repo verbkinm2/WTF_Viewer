@@ -12,7 +12,7 @@ class Table : public QDialog
     Q_OBJECT
 
 public:
-    explicit Table(int size, int** array, QWidget *parent = nullptr);
+    explicit Table(int size, double** array, QWidget *parent = nullptr);
     ~Table();
 
     void saveData();
@@ -20,7 +20,7 @@ public:
 private:
     Ui::Table *ui;
 
-    int** arrayBin = nullptr;
+    double** arrayBin = nullptr;
 
     // QWidget interface
 protected:
