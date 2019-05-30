@@ -36,13 +36,11 @@ MainWindow::MainWindow(QWidget *parent)
     pFSModel->setNameFilters(filter);
     pFSModel->setNameFilterDisables(false);
 
-
     pTreeView->setModel(pFSModel);
     pTreeView->header()->hideSection(1);
     pTreeView->header()->hideSection(2);
     pTreeView->header()->hideSection(3);
     pTreeView->setAnimated(true);
-
 
     pSplitter->addWidget(pTreeView);
     pSplitter->addWidget(pViewerWidget);
@@ -80,7 +78,6 @@ void MainWindow::createMenu()
     pMenuAbout= new QMenu("About");
     pMenuAbout->addAction(QIcon(":/author"),"Author", this, SLOT(slotAuthor()));
     pMenuAbout->addAction(QIcon(":/qt_logo"), "About Qt", QApplication::instance(), SLOT(aboutQt()));
-
 
     this->menuBar()->addMenu(pMenuFile);
     this->menuBar()->addMenu(pMenuSettings);

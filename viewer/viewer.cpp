@@ -65,6 +65,7 @@ Viewer::Viewer(QWidget *parent) :
     ui->graphicsView->viewport()->installEventFilter(eventFilterViewPort);
     connect(eventFilterViewPort, SIGNAL(signalWheel(int)), this, SLOT(slotScaleWheel(int)));
 
+    //соединение сигналов высылаемых классом ToolsPanel
     connect(ui->edit_panel, SIGNAL(signalSelectionToggle(bool)), this, SLOT(slotSelectionFrame(bool)));
     connect(ui->edit_panel, SIGNAL(signalPenToggle(bool)), this, SLOT(slotPen(bool)));
     connect(ui->edit_panel, SIGNAL(signalCutClicked(bool)), this, SLOT(slotCut()));
@@ -76,7 +77,7 @@ Viewer::Viewer(QWidget *parent) :
     connect(ui->width_selection, SIGNAL(valueChanged(int)), this, SLOT(slotMoveRectFromKey()) );
     connect(ui->heigth_selection, SIGNAL(valueChanged(int)), this, SLOT(slotMoveRectFromKey()) );
 
-    //
+    //Нажатия на кнопку Apply на панели фильтров clog
     connect(ui->clogFilterPanel, SIGNAL(signalApplyFilter()),       this, SLOT(slotApplyClogFilter()));
 
     //при первом запуске - вывести на экран надпись и отключить всё не нужное

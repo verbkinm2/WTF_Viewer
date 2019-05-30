@@ -28,6 +28,17 @@ private:
 
     enum TAB_NAME{MASK, CONVOLUTION, BACKPROJECTION};
 
+    //
+    float minus_one_or_zero;
+    int binning;	//ранг бингования
+
+    int** dynamicArrayInt(int N, int M);
+    float** dynamicArrayFloat(int N, int M);
+    int square_vychet(int i, int p);
+    void mask_construction(int N);
+
+    //
+
 private slots:
     void    slotGenerate();
     void    slotOpenTXT();
@@ -39,6 +50,7 @@ private slots:
 signals:
     void    signalGenerated();
     void    signalOpenTXT(QString);
+    void    signalSaveTXT();
 };
 
 #endif // MASKSETTINGS_H

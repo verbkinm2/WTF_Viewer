@@ -28,6 +28,7 @@ public:
 
     const static int CLOG_SIZE = 256;
 
+    //For cursor with Pen
     const static int X_HOT = 2;
     const static int Y_HOT = 23;
 
@@ -61,7 +62,6 @@ public:
     int         getColumnFromFile       (QString fileName);
     int         getRowFromFile          (QString fileName);
 
-    //скрыть все, кроме отображения
     void        setReadOnly             (bool value = true);
     void        hideAllPanel                 ();
     void        hideSettingsButton      (bool value = true);
@@ -76,6 +76,7 @@ private:
 
     bool    readOnly = false;
 
+    enum {PIX_AND_FILTER_PANEL, DATA_PANEL, BUTTONS_PANEL, INVERSION, SINGLE_WINDOW};
     /*
     [0 - pix. && filter pnael]
     [1 - data paNel]
@@ -84,13 +85,11 @@ private:
     [4 - single window]
     видимость панелей
     */
-    enum {PIX_AND_FILTER_PANEL, DATA_PANEL, BUTTONS_PANEL, INVERSION, SINGLE_WINDOW};
     bool    action_array[5];
-
-
 
     enum fileType {UNDEFINED, TXT, CLOG};
     enum tabName  {PIX_PROPERTY_TAB, CLOG_FILTER_TAB};
+
     //текущий тип файла
     fileType fType;
 
@@ -113,6 +112,7 @@ private:
 
     //двумерный массив с данными из файла
     int**       arrayOrigin             = nullptr;
+    //массив для нанесения маски из настроек Settings -Image
     int**       arrayMask               = nullptr;
 
     //переменные для хранения кол-ва строк и столбцов файла
@@ -168,6 +168,10 @@ private:
 
 public slots:
     void slotSetImageFile(QString file);
+    //сохранинеие в bmp
+    void        slotSaveBMP             ();
+    //сохранинеие в txt
+    void        slotSaveTXT             ();
 
 private slots:
     //поворот
@@ -178,10 +182,7 @@ private slots:
     void        slotScaled              ();
     // масштаб колёсиком мышки
     void        slotScaleWheel          (int);
-    //сохранинеие в bmp
-    void        slotSaveBMP             ();
-    //сохранинеие в txt
-    void        slotSaveTXT             ();
+
     //отрисовка imageOrigin в зависимости от значения checkBox'а Inversion
     void        slotInversionCheckBox   (int state);
 

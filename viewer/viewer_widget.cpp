@@ -33,6 +33,7 @@ Viewer_widget::Viewer_widget(QSettings &setting, QWidget *parent) :
     ui->mask_viewer->hideAllPanel();
 
     connect(ui->mask_settings, SIGNAL(signalOpenTXT(QString)), ui->mask_viewer, SLOT(slotSetImageFile(QString)));
+    connect(ui->mask_settings, SIGNAL(signalSaveTXT()), ui->mask_viewer, SLOT(slotSaveTXT()));
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(slotTabChanged(int)));
 }
