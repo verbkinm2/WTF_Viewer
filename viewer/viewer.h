@@ -59,8 +59,8 @@ public:
     QGraphicsScene                      defaultScene;
 
     QGraphicsScene*                     getScene();
-    int         getColumnFromFile       (QString fileName);
-    int         getRowFromFile          (QString fileName);
+    size_t      getColumnFromFile       (QString fileName);
+    size_t      getRowFromFile          (QString fileName);
 
     void        setReadOnly             (bool value = true);
     void        hideAllPanel                 ();
@@ -111,20 +111,20 @@ private:
     Frames frames;
 
     //двумерный массив с данными из файла
-    int**       arrayOrigin             = nullptr;
+    double**       arrayOrigin             = nullptr;
     //массив для нанесения маски из настроек Settings -Image
-    int**       arrayMask               = nullptr;
+    double**       arrayMask               = nullptr;
 
     //переменные для хранения кол-ва строк и столбцов файла
-    int column  = 0;
-    int row     = 0;
+    size_t column  = 0;
+    size_t row     = 0;
 
     //фильтр событий для сцены и представления
     FingerSlide* eventFilterScene = nullptr;
 
     //возвращает рисунок из файла или QImage::Format_Invalid
     QImage      createArrayImage        (const QString& fileName);
-    int         findMaxInArrayOrigin    ();
+    double findMaxInArrayOrigin();
 
     //преобразование диапазонов
     double      convert                 (double value,
@@ -167,7 +167,7 @@ private:
 
 
 public slots:
-    void slotSetImageFile(QString file);
+    void        slotSetImageFile(QString file);
     //сохранинеие в bmp
     void        slotSaveBMP             ();
     //сохранинеие в txt

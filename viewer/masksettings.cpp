@@ -44,14 +44,14 @@ int** MaskSettings::dynamicArrayInt(int N, int M)
      */
 }
 
-float** MaskSettings::dynamicArrayFloat(int N, int M)
+double** MaskSettings::dynamicArrayDouble(int N, int M)
 {
-    float** arrayPtr = nullptr;
+    double** arrayPtr = nullptr;
 
-    arrayPtr = new float *[N];
+    arrayPtr = new double *[N];
 
     for (int i = 0; i < N; ++i)
-        arrayPtr[i] = new float[M];
+        arrayPtr[i] = new double[M];
 
     return arrayPtr;
 }
@@ -104,7 +104,7 @@ int MaskSettings::square_vychet(int i, int p)
 
     for (int count = 0; count < p;)
     {
-        if (fabs(i) == mas[count])
+        if (qAbs(i) == mas[count])
         {
             sign = 1; goto finish;
         }
@@ -125,19 +125,18 @@ void MaskSettings::mask_construction(int N)
     int** a = nullptr;
     a = dynamicArrayInt(2 * N + 1, 2 * N + 1);	//создание массива стандартной маски
 
-    float** bincoded = nullptr;
-    bincoded = dynamicArrayFloat((2 * N + 1)*binning, (2 * N + 1)*binning);	//создание массива бининговой маски
+    double** bincoded = dynamicArrayDouble((2 * N + 1)*binning, (2 * N + 1)*binning);	//создание массива бининговой маски
 
-    float** decoded = nullptr;
-    decoded = dynamicArrayFloat(2 * N + 1, 2 * N + 1);	//создание массива декодирующей функции
+    double** decoded = nullptr;
+    decoded = dynamicArrayDouble(2 * N + 1, 2 * N + 1);	//создание массива декодирующей функции
 
-    float** mass_bp = nullptr;
-    mass_bp = dynamicArrayFloat(binning, binning);		//массив бинов
+    double** mass_bp = nullptr;
+    mass_bp = dynamicArrayDouble(binning, binning);		//массив бинов
 
 
     for (int i=0;i<binning;i++)						//заполнение массива бинов
         for (int j = 0; j < binning; j++) {
-            mass_bp[i][j] = float(arrayBin[i][j]);
+            mass_bp[i][j] = double(arrayBin[i][j]);
         }
 
     /*Построение массива стандартной маски*/
@@ -199,7 +198,7 @@ void MaskSettings::mask_construction(int N)
         for (int j = 0; j < 2 * N + 1; j++) {
 
             {
-                if (decoded[i][j] == 1) {
+                if (decoded[i][j] == 1.00) {
 
                     for (int k = 0; k < binning; k++)
                         for (int l = 0; l < binning; l++) {
@@ -221,11 +220,14 @@ void MaskSettings::mask_construction(int N)
 
     ofstream decoded_f("output.txt", ofstream::out);	//запись в файл, он же (ВЫВОД НА ФОРМУ) binningcoded
     for (int i = 0; i < ((N - 1) * 2 + 1)*binning; i++){
-        for (int j = 0; j < ((N - 1) * 2 + 1)*binning; j++)
-            decoded_f << bincoded[i][j] << " ";
+        for (int j = 0; j < ((N - 1) * 2 + 1)*binning; j++){
+            if(j != 0)
+                decoded_f << " ";
+            decoded_f << bincoded[i][j];
+        }
         decoded_f << endl;
     }
-
+    emit signalGenerated("output.txt");
     decoded_f.close();
 
     for (int i = 0; i < 2 * N + 1; ++i)	//очистка памяти

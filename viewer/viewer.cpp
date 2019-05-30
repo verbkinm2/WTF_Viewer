@@ -29,7 +29,6 @@ Viewer::Viewer(QWidget *parent) :
 
     createButtonMenu();
 
-
     //повороты
     connect(ui->rotate_plus, SIGNAL(clicked()), this, SLOT(slotRotate()));
     connect(ui->rotate_minus, SIGNAL(clicked()), this, SLOT(slotRotate()));
@@ -92,11 +91,11 @@ void Viewer::selectFile()
     currentScene->setSceneRect(QRect(0,0, 50,50));
     currentScene->addText("Select file!");
 }
-int Viewer::getColumnFromFile(QString fileName)
+size_t Viewer::getColumnFromFile(QString fileName)
 {
     return ListData(fileName).column;
 }
-int Viewer::getRowFromFile(QString fileName)
+size_t Viewer::getRowFromFile(QString fileName)
 {
     return ListData(fileName).row;
 }
@@ -148,13 +147,13 @@ QImage Viewer::getImageFromClogFile(QString fileName)
     column  = CLOG_SIZE;
     row     = CLOG_SIZE;
 
-    QImage image(column, row, QImage::Format_ARGB32_Premultiplied);
+    QImage image(int(column), int(row), QImage::Format_ARGB32_Premultiplied);
     image.fill(Qt::black);
 
     //выделяем память для основного массива
-    arrayOrigin = new int *[column];
-    for (int i = 0; i < column; ++i)
-        arrayOrigin[i] = new int[row];
+    arrayOrigin = new double *[column];
+    for (size_t  i = 0; i < column; ++i)
+        arrayOrigin[i] = new double[row];
 
 
     //наполняем основной массив данными согласно установленному фильтру
@@ -165,7 +164,7 @@ QImage Viewer::getImageFromClogFile(QString fileName)
 void Viewer::clearArrayOrigin()
 {
     if(arrayOrigin != nullptr){
-        for (int i = 0; i < column; ++i)
+        for (size_t  i = 0; i < column; ++i)
             delete[] arrayOrigin[i];
         delete[] arrayOrigin;
         arrayOrigin = nullptr;
@@ -324,8 +323,8 @@ void Viewer::connectSelectionSpinBox()
 void Viewer::applyClogFilter(QImage& image)
 {
     //обнуляем основной массив
-   for (int x = 0; x < column; ++x)
-       for (int y = 0; y < row; ++y)
+   for (size_t  x = 0; x < column; ++x)
+       for (size_t  y = 0; y < row; ++y)
            arrayOrigin[x][y] = 0;
 
     for (int frameNumber = 0; frameNumber < frames.getFrameCount(); ++frameNumber)
@@ -358,18 +357,18 @@ void Viewer::applyClogFilter(QImage& image)
     //проверяем настройки для картинки такие как рамка и маскирование пикселей
     imageSettingsForArray();
 
-    int max = findMaxInArrayOrigin();
+    double max = findMaxInArrayOrigin();
 
     //наполнение объекта QImage
-    for (int x = 0; x < column; ++x)
-        for (int y = 0; y < row; ++y) {
-            int value = int(convert(double(arrayOrigin[x][y]), \
+    for (size_t  x = 0; x < column; ++x)
+        for (size_t  y = 0; y < row; ++y) {
+            double value = convert(double(arrayOrigin[x][y]), \
                                             double(0), \
                                             double(max), \
                                             double(0), \
-                                            double(255) ) + 0.5);
-            QColor color(value, value, value);
-            image.setPixelColor(x, y, color);
+                                            double(255) );
+            QColor color(qRound(value), qRound(value), qRound(value));
+            image.setPixelColor(int(x), int(y), color);
         }
     //цвет пикселей, к которым применилась маска
     imageSettingsForImage(image);
@@ -378,7 +377,7 @@ void Viewer::applyClogFilter(QImage& image)
 void Viewer::applyClogFilterAdditionalFunction(const ePoint &point)
 {
     //если координаты точек выходят за границы - это просто игнорируется
-    if(point.x >= column || point.y >= row)
+    if(point.x >= int(column) || point.y >= int(row) )
         return;
     //Выбор режима - MediPix or TimePix
     if(ui->clogFilterPanel->isMediPix())
@@ -393,12 +392,12 @@ void Viewer::imageSettingsForImage(QImage &image)
         if(pSettings->value("SettingsImage/MasquradingGroupBox").toBool())
         {
             //рисуем маскированые пиксели выбраным цветом
-            for (int x = 0; x < column; ++x)
-                for (int y = 0; y < row; ++y)
+            for (size_t  x = 0; x < column; ++x)
+                for (size_t  y = 0; y < row; ++y)
                     if(arrayMask[x][y] > 0)
-                        image.setPixelColor(x, y, QColor(pSettings->value("SettingsImage/maskColor").toString()));
+                        image.setPixelColor(int(x), int(y), QColor(pSettings->value("SettingsImage/maskColor").toString()));
             //удаляем массив для маскирования пикселей
-            for (int i = 0; i < column; ++i)
+            for (size_t  i = 0; i < column; ++i)
                 delete[] arrayMask[i];
             delete[] arrayMask;
             arrayMask = nullptr;
@@ -425,26 +424,26 @@ void Viewer::imageSettingsForArray()
 void Viewer::createFrameInArray()
 {
     if(pSettings != nullptr){
-        int width = pSettings->value("frameWidth").toInt();
+        size_t  width = size_t(pSettings->value("frameWidth").toInt());
         if(width > column || width > row) width = 0;
 
         int value = pSettings->value("frameValue").toInt();
 
         //верх
-        for (int x = 0; x < column; ++x)
-            for (int y = 0; y < width; ++y)
+        for (size_t  x = 0; x < column; ++x)
+            for (size_t  y = 0; y < width; ++y)
                 arrayOrigin[x][y] = value;
         //низ
-        for (int x = 0; x < column; ++x)
-            for (int y = row - 1; y >= row - width; --y)
+        for (size_t  x = 0; x < column; ++x)
+            for (size_t  y = row - 1; y >= row - width; --y)
                 arrayOrigin[x][y] = value;
         //лево
-        for (int y = 0; y < row; ++y)
-            for (int x = 0; x < width; ++x)
+        for (size_t  y = 0; y < row; ++y)
+            for (size_t  x = 0; x < width; ++x)
                 arrayOrigin[x][y] = value;
         //право
-        for (int y = 0; y < row; ++y)
-            for (int x = column - 1; x >= column - width; --x)
+        for (size_t  y = 0; y < row; ++y)
+            for (size_t  x = column - 1; x >= column - width; --x)
                 arrayOrigin[x][y] = value;
     }
 }
@@ -453,12 +452,12 @@ void Viewer::createMaskInArray()
 {
     if(pSettings != nullptr){
         //выделяем память для массива маскирования пикселей, удаляем его в функции imageSettingsForImage
-        arrayMask = new int *[column];
-        for (int i = 0; i < column; ++i)
-            arrayMask[i] = new int[row];
+        arrayMask = new double *[column];
+        for (size_t  i = 0; i < column; ++i)
+            arrayMask[i] = new double[row];
         //обнуляем его
-        for (int x = 0; x < column; ++x)
-            for (int y = 0; y < row; ++y)
+        for (size_t  x = 0; x < column; ++x)
+            for (size_t  y = 0; y < row; ++y)
                 arrayMask[x][y] = 0;
 
         int value       = pSettings->value("maskValue").toInt();
@@ -466,8 +465,8 @@ void Viewer::createMaskInArray()
         bool after      = pSettings->value("maskAfter").toBool();
 
         //пробегаемся по всему массиву
-        for (int x = 0; x < column; ++x)
-            for (int y = 0; y < row; ++y)
+        for (size_t  x = 0; x < column; ++x)
+            for (size_t  y = 0; y < row; ++y)
             {
                 if(after)
                 {
@@ -546,7 +545,7 @@ void Viewer::slotCreateRectItem(QGraphicsRectItem * item)
 
 void Viewer::slotApplyClogFilter()
 {
-    QImage image(column, row, QImage::Format_ARGB32_Premultiplied);
+    QImage image(int(column), int(row), QImage::Format_ARGB32_Premultiplied);
     image.fill(Qt::white);
 
     applyClogFilter(image);
@@ -556,18 +555,18 @@ void Viewer::slotApplyClogFilter()
 
 void Viewer::slotRepaint()
 {
-    int max = findMaxInArrayOrigin();
+    double max = findMaxInArrayOrigin();
 
     //наполнение объекта QImage
-    for (int x = 0; x < column; ++x)
-        for (int y = 0; y < row; ++y) {
-            int value = int(convert(double(arrayOrigin[x][y]), \
+    for (size_t  x = 0; x < column; ++x)
+        for (size_t  y = 0; y < row; ++y) {
+            double value = convert(double(arrayOrigin[x][y]), \
                                             double(0), \
                                             double(max), \
                                             double(0), \
-                                            double(255) ) + 0.5);
-            QColor color(value, value, value);
-            imageOrigin.setPixelColor(x, y, color);
+                                            double(255) );
+            QColor color(qRound(value), qRound(value), qRound(value));
+            imageOrigin.setPixelColor(int(x), int(y), color);
         }
     slotInversionCheckBox(ui->inversion->checkState());
 }
@@ -616,7 +615,7 @@ void Viewer::slotDrawPoint(QPointF point)
     int x = int(point.x());
     int y = int(point.y());
 
-    if(x >= 0 && x < column && y >= 0 && y < row)
+    if(x >= 0 && x < int(column) && y >= 0 && y < int(row))
     {
         imageOrigin.setPixelColor(x, y, ui->edit_panel->getPenColor());
         slotInversionCheckBox(ui->inversion->checkState());
@@ -672,24 +671,24 @@ QImage Viewer::createArrayImage(const QString& fileName)
 {
     ListData data(fileName);
 
-    column  = int(data.column);
-    row     = int(data.row);
+    column  = data.column;
+    row     = data.row;
 
-    QImage image(column, row, QImage::Format_ARGB32_Premultiplied);
+    QImage image(int(column), int(row), QImage::Format_ARGB32_Premultiplied);
 
     if(column == 0 || row == 0 || column-1 > 65535 || row-1 > 65535)
         return QImage(QSize(0,0),QImage::Format_Invalid);
 
     //выделяем память для основного массива
-    arrayOrigin = new int *[column];
-    for (int i = 0; i < column; ++i)
-        arrayOrigin[i] = new int[row];
+    arrayOrigin = new double *[column];
+    for (size_t  i = 0; i < column; ++i)
+        arrayOrigin[i] = new double[row];
 
     //Заполнение матрицы данными из файла
     int iterrator = 0;
-    int value = 0;
-    for (int y = 0; y < row; ++y)
-        for (int x = 0; x < column; ++x) {
+    double value = 0;
+    for (size_t  y = 0; y < row; ++y)
+        for (size_t  x = 0; x < column; ++x) {
             value =  data.list.at(iterrator++);
             arrayOrigin[x][y] = value;
         }
@@ -697,18 +696,20 @@ QImage Viewer::createArrayImage(const QString& fileName)
     //проверяем настройки для картинки такие как рамка и маскирование пикселей
     imageSettingsForArray();
 
-    int max = findMaxInArrayOrigin();
+    double max = findMaxInArrayOrigin();
 
     //наполнение объекта QImage
-    for (int x = 0; x < column; ++x)
-        for (int y = 0; y < row; ++y) {
-            int value = int(convert(double(arrayOrigin[x][y]), \
+    for (size_t  x = 0; x < column; ++x)
+        for (size_t  y = 0; y < row; ++y) {
+            double value = convert(double(arrayOrigin[x][y]), \
                                             double(0), \
                                             double(max), \
                                             double(0), \
-                                            double(255) ) + 0.5);
-            QColor color(value, value, value);
-            image.setPixelColor(x, y, color);
+                                            double(255) );
+            if(value < 0)
+                value = 0;
+            QColor color(qRound(value), qRound(value), qRound(value));
+            image.setPixelColor(int(x), int(y), color);
         }
 
     imageSettingsForImage(image);
@@ -716,13 +717,13 @@ QImage Viewer::createArrayImage(const QString& fileName)
     return image;
 }
 
-int Viewer::findMaxInArrayOrigin()
+double Viewer::findMaxInArrayOrigin()
 {
-    int max = 0;
-    int value = 0;
+    double max = 0;
+    double value = 0;
 
-    for (int y = 0; y < row; ++y)
-        for (int x = 0; x < column; ++x) {
+    for (size_t y = 0; y < row; ++y)
+        for (size_t x = 0; x < column; ++x) {
             value = arrayOrigin[x][y];
             if(max < value) max = value;
         }
@@ -854,27 +855,27 @@ void Viewer::slotCut()
     }
 
 
-    int column  = int(ui->width_selection->value());
-    int row     = int(ui->heigth_selection->value());
+    size_t column  = size_t(ui->width_selection->value());
+    size_t row     = size_t(ui->heigth_selection->value());
 
-    QImage image(column, row, QImage::Format_ARGB32_Premultiplied);
+    QImage image(int(column), int(row), QImage::Format_ARGB32_Premultiplied);
 
 //    if(column == 0 || row == 0 || column-1 > 65535 || row-1 > 65535)
 //        setImage(QImage(QSize(0,0),QImage::Format_Invalid));
 
     //Временный массив для данных преобразованного диапазона
-    int** array;
+    double** array;
 
     //выделяем память для временного массива
-    array = new int *[column];
-    for (int i = 0; i < column; ++i)
-        array[i] = new int[row];
+    array = new double *[column];
+    for (size_t i = 0; i < column; ++i)
+        array[i] = new double[row];
 
     //Заполнение временного массива данными из выделенной области
-    int value = 0;
-    for (int x = int(ui->x_selection->value()), tmpX = 0; tmpX < column; ++x, ++tmpX)
-        for (int y = int(ui->y_selection->value()), tmpY = 0; tmpY < row; ++y, ++tmpY) {
-            if( (x < 0) || (x >= this->column) || (y < 0) || (y >= this->row) )
+    double value = 0;
+    for (int x = int(ui->x_selection->value()), tmpX = 0; tmpX < int(column); ++x, ++tmpX)
+        for (int y = int(ui->y_selection->value()), tmpY = 0; tmpY < int(row); ++y, ++tmpY) {
+            if( (x < 0) || (x >= int(this->column)) || (y < 0) || (y >= int(this->row)) )
                 value = 0;
             else
                 value = arrayOrigin[x][y];
@@ -887,41 +888,41 @@ void Viewer::slotCut()
     this->row   = row;
 
     //выделяем память для основного массива
-    arrayOrigin = new int *[column];
-    for (int i = 0; i < column; ++i)
-        arrayOrigin[i] = new int[row];
+    arrayOrigin = new double *[column];
+    for (size_t i = 0; i < column; ++i)
+        arrayOrigin[i] = new double[row];
 
     value = 0;
     //копируем временный массив в основной
-    for (int x = 0; x < column; ++x)
-        for (int y = 0; y < row; ++y) {
+    for (size_t x = 0; x < column; ++x)
+        for (size_t y = 0; y < row; ++y) {
             value = array[x][y];
             arrayOrigin[x][y] = value;
         }
 
-    int max = findMaxInArrayOrigin();
+    double max = findMaxInArrayOrigin();
 
     // преобразование диапазонов
-    for (int x = 0; x < column; ++x)
-        for (int y = 0; y < row; ++y) {
-            int value = int(convert(double(arrayOrigin[x][y]), \
+    for (size_t x = 0; x < column; ++x)
+        for (size_t y = 0; y < row; ++y) {
+            double value = convert(double(arrayOrigin[x][y]), \
                                             double(0), \
                                             double(max), \
                                             double(0), \
-                                            double(255) ) + 0.5);
+                                            double(255) );
             array[x][y] = value;
         }
 
     //наполнение объекта QImage
-    for (int x = 0; x < column; ++x)
-        for (int y = 0; y < row; ++y) {
-            int value = array[x][y];
-            QColor color(value, value, value);
-            image.setPixelColor(x, y, color);
+    for (size_t x = 0; x < column; ++x)
+        for (size_t y = 0; y < row; ++y) {
+            double value = array[x][y];
+            QColor color(qRound(value), qRound(value), qRound(value));
+            image.setPixelColor(int(x), int(y), color);
         }
 
     //удаление временного массива
-    for (int i = 0; i < column; ++i)
+    for (size_t i = 0; i < column; ++i)
         delete[] array[i];
     delete[] array;
 
@@ -976,8 +977,8 @@ void Viewer::slotViewPosition(QPointF pos)
         int x = int(pos.x());
         int y = int(pos.y());
 
-        if( (x < column) && (y < row) ){
-            int data = arrayOrigin[x][y];
+        if( (x < int(column)) && (y < int(row)) ){
+            double data = arrayOrigin[x][y];
             ui->x->setValue(x);
             ui->y->setValue(y);
             ui->data->setValue(data);
@@ -1003,7 +1004,7 @@ void Viewer::slotSaveBMP()
                                                     "Images (*.bmp);;All files (*.*)");
 
 
-    QImage image(column, row, QImage::Format_RGB32);
+    QImage image(int(column), int(row), QImage::Format_RGB32);
 
     if(ui->inversion->isChecked())
         image = this->getImageInversion();
@@ -1023,9 +1024,9 @@ void Viewer::slotSaveTXT()
     QFile file(fileName);
     QTextStream writeStrime(&file);
     if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-    for (int x = 0; x < row; ++x)
+    for (size_t x = 0; x < row; ++x)
     {
-        for (int y = 0; y < column; ++y) {
+        for (size_t y = 0; y < column; ++y) {
             if(y != 0)
                 writeStrime << " ";
             writeStrime << QString::number(arrayOrigin[y][x]);

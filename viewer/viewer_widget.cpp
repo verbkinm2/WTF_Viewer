@@ -34,8 +34,13 @@ Viewer_widget::Viewer_widget(QSettings &setting, QWidget *parent) :
 
     connect(ui->mask_settings, SIGNAL(signalOpenTXT(QString)), ui->mask_viewer, SLOT(slotSetImageFile(QString)));
     connect(ui->mask_settings, SIGNAL(signalSaveTXT()), ui->mask_viewer, SLOT(slotSaveTXT()));
+    connect(ui->mask_settings, SIGNAL(signalGenerated(QString)), ui->mask_viewer, SLOT(slotSetImageFile(QString)));
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(slotTabChanged(int)));
+
+    //следующие две строчки - что бы сразу отлавливались сигналы при перемещении курсора над View
+    ui->tabWidget->setCurrentIndex(1);
+    ui->tabWidget->setCurrentIndex(0);
 }
 
 Viewer_widget::~Viewer_widget()

@@ -352,7 +352,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="data">
+       <widget class="QDoubleSpinBox" name="data">
         <property name="toolTip">
          <string>Data in &quot;pixel&quot;</string>
         </property>
@@ -370,12 +370,6 @@
         </property>
         <property name="prefix">
          <string>Data: </string>
-        </property>
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>65535</number>
         </property>
        </widget>
       </item>

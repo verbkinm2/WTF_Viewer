@@ -6,7 +6,7 @@ ListData::ListData(QString fileName)
 {
      this->checkFile(fileName);
 }
-QList<int> ListData::checkFile(QString fileName)
+QList<double> ListData::checkFile(QString fileName)
 {
     QFile file(fileName);
 
@@ -42,7 +42,7 @@ QList<int> ListData::checkFile(QString fileName)
             int countInLine = splitString.length();
 
             foreach (QString element, splitString)
-                list.append(int(element.toDouble()));
+                list.append(element.toDouble());
 
             //если в текущей строке элементов меньше чем в максимальной строке - добавляем нули
             while (int(countInLine )!= maxCountElement)
@@ -52,8 +52,8 @@ QList<int> ListData::checkFile(QString fileName)
             }
 
         }
-        column = maxCountElement;
-        row    = countString;
+        column = size_t(maxCountElement);
+        row    = size_t(countString);
         file.close();
     }
 

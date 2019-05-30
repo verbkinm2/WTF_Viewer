@@ -5,13 +5,13 @@
 
 struct ListData
 {
-    int row     = 0;
-    int column  = 0;
-    QList<int>  list;
+    size_t  row     = 0;
+    size_t  column  = 0;
+    QList<double>  list;
 
     ListData(QString fileName);
 
-    QList<int> checkFile(QString fileName);
+    QList<double> checkFile(QString fileName);
 };
 
 
