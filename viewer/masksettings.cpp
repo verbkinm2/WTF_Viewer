@@ -219,8 +219,8 @@ void MaskSettings::mask_construction(int N)
     }
 
     ofstream decoded_f("output.txt", ofstream::out);	//запись в файл, он же (ВЫВОД НА ФОРМУ) binningcoded
-    for (int i = 0; i < ((N - 1) * 2 + 1)*binning; i++){
-        for (int j = 0; j < ((N - 1) * 2 + 1)*binning; j++){
+    for (int i = 0; i < (N * 2 + 1)*binning; i++){
+        for (int j = 0; j < (N * 2 + 1)*binning; j++){
             if(j != 0)
                 decoded_f << " ";
             decoded_f << bincoded[i][j];
