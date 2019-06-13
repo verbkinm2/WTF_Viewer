@@ -18,5 +18,7 @@
         <file alias="image">img/image.png</file>
         <file alias="table">img/table.png</file>
         <file alias="settings">img/settings.png</file>
+        <file alias="horizontal">img/horizontal.png</file>
+        <file alias="vertical">img/vertical.png</file>
     </qresource>
 </RCC>
