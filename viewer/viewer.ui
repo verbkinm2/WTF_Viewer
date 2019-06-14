@@ -523,8 +523,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>../img/horizontal.png</normaloff>../img/horizontal.png</iconset>
+         <iconset resource="../img.qrc">
+          <normaloff>:/horizontal</normaloff>:/horizontal</iconset>
         </property>
        </widget>
       </item>
@@ -540,8 +540,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>../img/vertical.png</normaloff>../img/vertical.png</iconset>
+         <iconset resource="../img.qrc">
+          <normaloff>:/vertical</normaloff>:/vertical</iconset>
         </property>
        </widget>
       </item>
