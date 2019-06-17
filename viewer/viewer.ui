@@ -548,7 +548,7 @@
       <item>
        <widget class="QPushButton" name="rotate_plus">
         <property name="enabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="toolTip">
          <string>+90º</string>
