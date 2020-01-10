@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ClogFilterPanel</class>
+ <widget class="QWidget" name="ClogFilterPanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>603</width>
+    <height>466</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="RangeWidget" name="clusterRangeGroup" native="true"/>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="pixGroup_2">
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QRadioButton" name="totRange">
+        <property name="toolTip">
+         <string>MidiPix filter</string>
+        </property>
+        <property name="text">
+         <string>Tot range:</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="totRangeFull">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>TImePix filter</string>
+        </property>
+        <property name="text">
+         <string>Full tot range:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="page_0">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="RangeWidget_Extended" name="totRangeGroup" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_1">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="RangeWidget" name="totRangeGroupFull" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="pixGroup">
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QRadioButton" name="midiPixRadioButton">
+        <property name="toolTip">
+         <string>MidiPix filter</string>
+        </property>
+        <property name="text">
+         <string>MidiPix</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="timePixRadioButton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>TImePix filter</string>
+        </property>
+        <property name="text">
+         <string>TimePix</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="apply">
+     <property name="toolTip">
+      <string>Apply filter (Enter)</string>
+     </property>
+     <property name="text">
+      <string>Apply Filter</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RangeWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">../WTF_Viewer/viewer_widget/viewer/panels/clogfilterpanel/rangewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>RangeWidget_Extended</class>
+   <extends>QWidget</extends>
+   <header location="global">../WTF_Viewer/viewer_widget/viewer/panels/clogfilterpanel/rangewidget_extended.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>midiPixRadioButton</tabstop>
+  <tabstop>timePixRadioButton</tabstop>
+  <tabstop>apply</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
