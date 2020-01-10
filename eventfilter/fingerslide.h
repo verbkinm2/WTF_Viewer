@@ -1,55 +1,58 @@
 #ifndef FINGERSLIDE_H
 #define FINGERSLIDE_H
 
-#include <QObject>
-
-#include <QEvent>
-#include <QMouseEvent>
-#include <QWheelEvent>
-#include <QGraphicsView>
-#include <QGraphicsItem>
 #include <QGraphicsRectItem>
-#include <QGraphicsSceneMoveEvent>
-#include <QGraphicsSceneMouseEvent>
-//#include <QGraphicsSceneWheelEvent>
+#include <QGraphicsView>
+#include <QEvent>
 
 class FingerSlide : public QObject
 {
     Q_OBJECT
-public:
-    FingerSlide(QObject *parent = nullptr);
-    ~FingerSlide();
 
 private:
 //координаты курсора
-    int x, y;
+    int _x, _y;
+    int _preX, _preY;
+    int _stepX, _stepY;
+    QGraphicsView *_pGraphView;
+    QGraphicsScene *_pScene;
+    QPointF _point, _rectPoint;
 
-    int preX, preY;
-    int stepX, stepY;
+    QObject* _pObject;
+    QEvent* _pEvent;
 
-    bool eventFilterScene(QObject* object, QEvent* event);
-    bool eventFilterViewport(QObject* object, QEvent* event);
+    inline bool isDrawingPen();
 
-    QPointF point, rectPoint;
+    void sceneMouseMovement();
+    void sceneMousePress();
+    void sceneMouseRelease();
+    void sceneMouseDrawRect(QGraphicsRectItem* rectItem, qreal x, qreal y, qreal width, qreal height);
+
+    void viewportSlide();
+    void viewportSliding();
+    void viewportSlidingHorizontal();
+    void viewportSlidingVertical();
+    bool viewportMouseWheel();
+    void viewportSetPreXY();
+    void viewporMouseMovement();
+
+    bool eventFilterScene();
+    bool eventFilterViewport();
+
 protected:
     virtual bool eventFilter(QObject* object, QEvent* event);
 
-//имитация touchpada'а
-    void slide(QObject* object, QEvent* event);
-
-
 signals:
     void signalRelease();
-
     void signalWheel(int);
+    void signalMousePos(QPointF);
+    void siganlRect(QRect);
+    void signalRectMove(QPoint);
 
-    void signalMousePos         (QPointF);
-    void siganlRect             (QRect);
-    void signalRectMove         (QPoint);
+    void signalCreateRectItem(QGraphicsRectItem*);
 
-    void signalCreateRectItem   (QGraphicsRectItem*);
+    void signalDrawPoint(QPointF);
 
-    void signalDrawPoint        (QPointF);
 
 };
 

@@ -2,7 +2,9 @@
 #define GRAPHDIALOG_H
 
 #include <QDialog>
-#include "../viewer/frames/frames.h"
+#include <memory>
+#include <QSettings>
+#include "../viewer_widget/frames/frames.h"
 
 namespace Ui {
 class GraphDialog;
@@ -13,29 +15,27 @@ class GraphDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit GraphDialog(Frames* frames, QWidget *parent = nullptr);
+    explicit GraphDialog(std::shared_ptr<QSettings> settings, const Frames& frames, QWidget *parent = nullptr);
     ~GraphDialog();
 
-    int getCurrentClusterLenght();
-    QString getCurrentX();
-    QString getCurrentY();
+    size_t getCurrentClusterLenght();
+    QString getType();
+    QString getClusterSize();
     QString getCurrentWindowGraph();
 
-    void    selectLastWindow();
+    void selectLastWindow();
 
-    //очистить windowGraph
-    void    clearWindow();
+    void clearWindow(); //очистить windowGraph
+    void appendWindow(QString); //добавить к windowGraph строку
 
-    //добавить к windowGraph строку
-    void appendWindow(QString value);
-
-    QString NEW_WINDOW = "New Window";
+    const QString _NEW_WINDOW;
 
 private:
     Ui::GraphDialog *ui;
+    std::shared_ptr<QSettings> pSettings;
 
 private slots:
-    void slotSelectDataX(QString value);
+    void slotSelectDataX(QString);
 
 signals:
     void signalDataXChanged(QString);
