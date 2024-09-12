@@ -176,6 +176,8 @@ public slots:
 private slots:
     //поворот
     void        slotRotate              ();
+    // отражение по горизонтали
+    void        slotMirror              ();
     //сброс трансформации
     void        slotResetTransform      ();
     //масштаб при нажатии на виджете кнопок + и -

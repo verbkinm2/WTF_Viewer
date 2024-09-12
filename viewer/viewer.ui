@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>626</width>
-    <height>458</height>
+    <width>1162</width>
+    <height>675</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -512,6 +512,40 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="horizontal_mirror">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>horizontal_mirror</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../img.qrc">
+          <normaloff>:/horizontal</normaloff>:/horizontal</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="vertical_mirror">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>vertical_mirror</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../img.qrc">
+          <normaloff>:/vertical</normaloff>:/vertical</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="rotate_plus">
         <property name="enabled">
          <bool>false</bool>
@@ -565,7 +599,7 @@
       <item>
        <widget class="QPushButton" name="rotate_minus">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="toolTip">
          <string>-90º</string>
@@ -589,7 +623,7 @@
       <item>
        <widget class="QPushButton" name="reset_transform">
         <property name="enabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="toolTip">
          <string>reset transformation</string>

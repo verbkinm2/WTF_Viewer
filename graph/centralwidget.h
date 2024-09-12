@@ -1,10 +1,6 @@
 #ifndef CENTRALWIDGET_H
 #define CENTRALWIDGET_H
 
-#include "chart.h"
-#include "chartview.h"
-#include "panelwidget.h"
-
 #include <QMainWindow>
 #include <QLineSeries>
 #include <QScatterSeries>
@@ -20,6 +16,11 @@
 
 #include <QHBoxLayout>
 
+#include "chart.h"
+#include "chartview.h"
+#include "panelwidget.h"
+#include "range.h"
+
 QT_CHARTS_USE_NAMESPACE
 
 class CentralWidget : public QMainWindow
@@ -29,85 +30,84 @@ public:
     CentralWidget(QWidget *parent = nullptr);
     ~CentralWidget();
 
-    void addSeries(QVector<QPointF> pointVector, QXYSeries::SeriesType type = QXYSeries::SeriesTypeLine,
-                   QString legendTitle = "", QString axsisX_Title = "X", QString axsisY_Title = "Y");
-    void addSeries(QVector<QPointF> pointVector, QString legendTitle = "",
+    void addSeries(std::map<double, double> &map, QString legendTitle = "",
                    QString axsisX_Title = "X", QString axsisY_Title = "Y");
 
-    void    setTitle(QString title);
-    QString getTitle();
-    QString getDataXType();
+    void setTitle(QString title);
 
-    void           createAxes();
+    QString getTitle() const;
+    QString getDataXType() const;
+    QHBoxLayout getLayout() const;
 
 private:
-    QWidget        centralWidget;
-    QLabel         statusBarWidget;
+    QWidget _centralWidget;
+    QLabel _statusBarWidget;
 
-    ChartView      chartView;
-    Chart          chart;
+    ChartView _chartView;
+    Chart _chart;
 
-    QLineSeries    lineSeriesX;
-    QLineSeries    lineSeriesY;
+    QLineSeries _lineSeriesX;
+    QLineSeries _lineSeriesY;
 
-    QHBoxLayout    layout;
+    QHBoxLayout _layout;
 
-    PanelWidget    panelWidget;
+    PanelWidget _panelWidget;
 
-    QValueAxis*     pAxisX = nullptr;
-    QValueAxis*     pAxisY = nullptr;
+    QValueAxis* _pAxisX;
+    QValueAxis* _pAxisY;
 
-    double maxX = 0;
-    double maxY = 0;
-    double minX = std::numeric_limits<int>::max();
-    double minY = std::numeric_limits<int>::max();
+    Range<double> _rangeX, _rangeY;
 
-    QMenu         menuFile, menuView;
+    QMenu _menuFile, _menuView;
+
+    void addSeries(std::map<double, double> &map, QXYSeries::SeriesType type = QXYSeries::SeriesTypeLine,
+                   QString legendTitle = "", QString axsisX_Title = "X", QString axsisY_Title = "Y");
 
     //ось X и Y на всем полотне
-    void XYDefault();
+    void setLinersXYDefault();
+    void repaintXYAxes();
 
+    void createAxes();
     void createMenu();
+    QXYSeries *createSeriesAccordingType(QXYSeries::SeriesType &type);
 
-    double findMaxX(QXYSeries* series);
-    double findMinX(QXYSeries* series);
-    double findMaxY(QXYSeries* series);
-    double findMinY(QXYSeries* series);
+    double findMaxX(QXYSeries *series);
+    double findMinX(QXYSeries *series);
+    double findMaxY(QXYSeries *series);
+    double findMinY(QXYSeries *series);
+
+    void connectPanelWidgetSignals();
+    void fillSeriesOfPoints(std::map<double, double> &map, QXYSeries *series);
+
+    void setMinAndMaxForXY(QXYSeries *series);
+    void setRangeAndTitleForAxes(const QString &axsisX_Title, const QString &axsisY_Title);
+    void setChartViewXYRange();
+    void setSeriesProperty(QXYSeries *series);
 
 private slots:
-    void    slotSetTheme            (int theme);
-    void    slotSetLegentPosition   (int position);
-    void    slotSetTitle            (QString title);
-    void    slotAnimation           (bool value);
-    void    slotAntialiasing        (bool value);
-
-    void    slotSetTcickCountX      (int value);
-    void    slotSetTcickCountY      (int value);
-
-    void    slotSaveBMP             ();
-
-    void    slotReRange             ();
-
-    void    slotResetZoomAndPosition();
-
-    void    slotViewXYCoordinate    (QPointF point);
-
-    void    slotSetRubberMode       (QChartView::RubberBand mode);
-    void    slotRangeXChanged       (qreal, qreal);
-    void    slotRangeYChanged       (qreal, qreal);
-
-    void    slotRangeXSet           (qreal, qreal);
-    void    slotRangeYSet           (qreal, qreal);
-
-    void    slotSeriesTypeChanged   ();
-
-public slots:
+    void slotSetTheme(int);
+    void slotSetLegentPosition(int);
+    void slotSetTitle(QString);
+    void slotAnimation(bool);
+    void slotAntialiasing(bool);
+    void slotSetTcickCountX(int);
+    void slotSetTcickCountY(int);
+    void slotSaveBMP();
+    void slotReRange();
+    void slotResetZoomAndPosition();
+    void slotViewXYCoordinate(QPointF);
+    void slotSetRubberMode(QChartView::RubberBand);
+    void slotRangeXChanged(qreal, qreal);
+    void slotRangeYChanged(qreal, qreal);
+    void slotRangeXSet(qreal, qreal);
+    void slotRangeYSet(qreal, qreal);
+    void slotSeriesTypeChanged();
 
 protected:
-    virtual void closeEvent(QCloseEvent *event);
+    virtual void closeEvent(QCloseEvent *);
 
 signals:
-    void signalCloseWindow(QObject*);
+    void signalCloseWindow(QObject *);
 };
 
 #endif // CENTRALWIDGET_H

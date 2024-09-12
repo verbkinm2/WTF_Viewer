@@ -5,33 +5,21 @@
 #include <QtWidgets/QRubberBand>
 
 #include <QValueAxis>
+#include "range.h"
 
 QT_CHARTS_USE_NAMESPACE
 
-//![1]
 class ChartView : public QChartView
-//![1]
 {
     Q_OBJECT
 public:
     ChartView(QWidget *parent = nullptr);
 
-    struct rangeAxis
-    {
-        rangeAxis(double min = std::numeric_limits<int>::min(), double max = 0) {
-            this->min = min;
-            this->max = max;
-
-        }
-        double min;
-        double max;
-    };
-
-    struct rangeAxis rangeX, rangeY;
+    void setRangeDefault(const Range<double> &rangeX, const Range<double> &rangeY);
 
 public slots:
     void slotResetZoomAndPosition();
-//![2]
+
 protected:
     bool vieportEvent(QEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -41,11 +29,10 @@ protected:
     void wheelEvent(QWheelEvent *event);
     bool event(QEvent* ev);
 
-//![2]
-
 private:
-    //точка с координатами Charts, где была нажата правая кнопка
-    QPointF lastMousePos;
+    QPointF _lastMousePos;
+
+    Range<double> _rangeX, _rangeY;
 
 signals:
     void signalMousePosition(QPointF);

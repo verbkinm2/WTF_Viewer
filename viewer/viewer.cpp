@@ -34,6 +34,10 @@ Viewer::Viewer(QWidget *parent) :
     connect(ui->rotate_minus, SIGNAL(clicked()), this, SLOT(slotRotate()));
     connect(ui->angle, SIGNAL(valueChanged(double)), this, SLOT(slotRotate()));
 
+    connect(ui->horizontal_mirror, SIGNAL(clicked()), this, SLOT(slotMirror()));
+    connect(ui->vertical_mirror, SIGNAL(clicked()), this, SLOT(slotMirror()));
+
+
     //сброс трансформации
     connect(ui->reset_transform, SIGNAL(clicked()), this, SLOT(slotResetTransform()));
 
@@ -934,24 +938,69 @@ void Viewer::slotCut()
 void Viewer::slotRotate()
 {
     if( sender()->objectName() == "rotate_plus" ){
-        ui->angle->setValue(ui->angle->value() + 90);
+//        ui->angle->setValue(ui->angle->value() + 90);
+            size_t matrix_rang = row;
+            for (size_t i = 0; i < row / 2; i++)
+            {
+                for (size_t j = i; j < row - 1 - i; j++)
+                {
+                    double tmp = arrayOrigin[i][j];
+                    arrayOrigin[i][j] = arrayOrigin[j][matrix_rang - i - 1];
+                    arrayOrigin[j][matrix_rang - i - 1] = arrayOrigin[matrix_rang - i - 1][matrix_rang - j - 1];
+                    arrayOrigin[matrix_rang - i - 1][matrix_rang - j - 1] = arrayOrigin[matrix_rang - j - 1][i];
+                    arrayOrigin[matrix_rang - j - 1][i] = tmp;
+                }
+            }
     }
     else if ( sender()->objectName() == "rotate_minus" ){
-        ui->angle->setValue(ui->angle->value() - 90);
+        size_t matrix_rang = row;
+        for (size_t i = 0; i < row / 2; i++)
+        {
+            for (size_t j = i; j < row - 1 - i; j++)
+            {
+                double tmp = arrayOrigin[i][j];
+                arrayOrigin[i][j] = arrayOrigin[matrix_rang - j - 1][i];
+                arrayOrigin[matrix_rang - j - 1][i] = arrayOrigin[matrix_rang - i - 1][matrix_rang - j - 1];
+                arrayOrigin[matrix_rang - i - 1][matrix_rang - j - 1] = arrayOrigin[j][matrix_rang - i - 1];
+                arrayOrigin[j][matrix_rang - i - 1] = tmp;
+            }
+        }
+//        ui->angle->setValue(ui->angle->value() - 90);
     }
     else
     {
-        itemForeground->setTransformOriginPoint(column / 2, row / 2);
-//        itemForeground->setRotation(ui->angle->value());
-        QTransform transform;
-//        transform = transform.translate(500,500);
-        transform.rotate(ui->angle->value(), Qt::ZAxis);
-        QImage img = imageOrigin.transformed(transform, Qt::FastTransformation);
-        itemForeground->setPixmap(QPixmap::fromImage(img));
+        ;
+    }
+
+    slotRepaint();
+}
+
+void Viewer::slotMirror()
+{
+    if( sender()->objectName() == "horizontal_mirror" )
+    {
+        for (size_t i = 0; i < row / 2; i++)
+                {
+                    std::swap(arrayOrigin[i], arrayOrigin[row - i - 1]);
+
+                }
 
     }
 
-    angle = ui->angle->value();
+    else if( sender()->objectName() == "vertical_mirror" )
+    {
+        for (size_t i = 0; i < row; i++)
+        {
+            for (size_t j = 0; j < row / 2; j++)
+                    {
+                        std::swap(arrayOrigin[i][j], arrayOrigin[i][row - j - 1]);
+
+                    }
+        }
+
+    }
+
+    slotRepaint();
 }
 void Viewer::slotResetTransform()
 {

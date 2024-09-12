@@ -43,6 +43,7 @@ public:
 
     void setVector(QVector<QPointF> vector);
     void addPoint(QPointF point);
+    void addMapping(QString color, QRect area);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -51,13 +52,10 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
-    void addMapping(QString color, QRect area);
-    void clearMapping() { m_mapping.clear(); }
-
     void updateColor(QColor color);
 
 private:
-    QList<QVector<qreal> * > m_data;
+    QList<QVector<qreal>*> m_data;
     QHash<QString, QRect> m_mapping;
     int m_columnCount;
     int m_rowCount;

@@ -3,23 +3,31 @@
 
 #include <QDebug>
 
-GraphDialog::GraphDialog(Frames *frames, QWidget *parent) :
+GraphDialog::GraphDialog(std::shared_ptr<QSettings> settings, const Frames &frames, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::GraphDialog)
+    _NEW_WINDOW("New Window"),
+    ui(new Ui::GraphDialog),
+    pSettings(settings)
 {
     ui->setupUi(this);
 
-//    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
     ui->DataY->addItem("All ");
-    foreach(int value, frames->getClustersLenghtList())
+    for(auto &value : frames.getClustersLengthVector())
         ui->DataY->addItem(QString::number(value));
 
-//    QApplication::restoreOverrideCursor();
+    connect(ui->DataX, &QComboBox::currentTextChanged, this, &GraphDialog::slotSelectDataX);
 
-    connect(ui->DataX, SIGNAL(currentTextChanged(QString)), this, SLOT(slotSelectDataX(QString)));
+    ui->windowGraph->addItem(_NEW_WINDOW);
 
-    ui->windowGraph->addItem(NEW_WINDOW);
+    pSettings->beginGroup("GeneralCalibration");
+
+    ui->A->setValue(pSettings->value("A", 0.0).toDouble());
+    ui->B->setValue(pSettings->value("B", 0.0).toDouble());
+    ui->C->setValue(pSettings->value("C", 0.0).toDouble());
+    ui->T->setValue(pSettings->value("T", 0.0).toDouble());
+    ui->coefficients->setChecked(pSettings->value("apply", false).toBool());
+
+    pSettings->endGroup();
 }
 
 GraphDialog::~GraphDialog()
@@ -27,17 +35,17 @@ GraphDialog::~GraphDialog()
     delete ui;
 }
 
-int GraphDialog::getCurrentClusterLenght()
+size_t GraphDialog::getCurrentClusterLenght()
 {
-    return ui->DataY->currentText().toInt();
+    return ui->DataY->currentText().toULongLong();
 }
 
-QString GraphDialog::getCurrentX()
+QString GraphDialog::getType()
 {
     return ui->DataX->currentText();
 }
 
-QString GraphDialog::getCurrentY()
+QString GraphDialog::getClusterSize()
 {
     return ui->DataY->currentText();
 }
@@ -55,7 +63,7 @@ void GraphDialog::selectLastWindow()
 void GraphDialog::clearWindow()
 {
     ui->windowGraph->clear();
-    ui->windowGraph->addItem(NEW_WINDOW);
+    ui->windowGraph->addItem(_NEW_WINDOW);
 }
 
 void GraphDialog::appendWindow(QString value)
